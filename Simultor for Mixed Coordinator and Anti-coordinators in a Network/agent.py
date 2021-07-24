@@ -12,7 +12,7 @@ class Agent:
         self.A_neighbors_count = 0
         self.B_neighbors_count = 0
         self.rule = "CO"#=type = upfate rule(coordinating , anti_coordinating
-    def __coordinating(self, agents):
+    def __coordinating(self, agent):
 
         total_neighbors_count = len(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
@@ -24,9 +24,9 @@ class Agent:
         # best_neighbor = agents[best_neighbor_id]
 
         if self.A_neighbors_count>1/2*total_neighbors_count:
-            self.next_strategy = 1
+            self.next_strategy = "A"
         elif self.A_neighbors_count<1/2*total_neighbors_count:
-            self.next_strategy = 0
+            self.next_strategy = "B"
         else:
             self.next_strategy = self.strategy
 
@@ -42,19 +42,19 @@ class Agent:
         # best_neighbor = agents[best_neighbor_id]
 
         if self.A_neighbors_count<1/2*total_neighbors_count:
-            self.next_strategy = 1
+            self.next_strategy = "A"
         elif self.A_neighbors_count>1/2*total_neighbors_count:
-            self.next_strategy = 0
+            self.next_strategy = "B"
         else:
             self.next_strategy = self.strategy
 
-    def decide_next_strategy(self, agents):
+    def decide_next_strategy(self, agent):
 
         if self.rule == "CO":
-            self.__coordinating(agents)
+            self.__coordinating(agent)
 
         elif self.rule == "ANTI":
-            self.__anti_coordinating(agents)
+            self.__anti_coordinating(agent)
 
     def update_strategy(self):
         self.strategy = self.next_strategy

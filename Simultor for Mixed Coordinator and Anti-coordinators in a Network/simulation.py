@@ -21,11 +21,19 @@ class Simulation:
         self.network_type = network_type
         self.network = None
         self.agents = self.__generate_agents(population, average_degree)
-        self.initial_cooperators = self.__choose_initial_cooperators_if_synchronous()
-        self.time_steps = 1
-        self.updating_activation_sequence = None
-        self.coordinating_fraction = 1/2
-        self.population = 100
+        # self.cooperators = self.choose
+        self.time_steps = time_steps
+        self.updating_activation_sequence = updating_activation_sequence
+        self.coordinating_fraction = coordinating_fraction
+        self.population = population
+        self.average_degree = average_degree
+        if(self.updating_activation_sequence == "synchronous"):
+           self.active_agents =  self.__choose_cooperators_if_synchronous()
+        elif(self.updating_activation_sequence == "asynchronous"):
+            self.active_agents = self.__choose_cooperators_if_asynchronous()
+        else:
+            self.active_agents = self.__choose_cooperators_if_partial()
+
     def __generate_agents(self, population, average_degree):
         if self.network_type == "lattice":
             self.network = self.__generate_lattice(population)
@@ -81,7 +89,7 @@ class Simulation:
                 G.add_edge((i,j), (i+1,j-1))
                 G.add_edge((i,j), (i-1,j+1))
                 G.add_edge((i,j), (i-1,j-1))
-            
+
         # Add edge along i = 0, j=1~n-2
         for j in range(1,n-1):
             G.add_edge((0,j), (n-1,j))
@@ -122,23 +130,25 @@ class Simulation:
         
         return G
 
-    def __choose_initial_cooperators_if_partial(self):
+    def __choose_cooperators_if_partial(self):
         population = len(self.agents)
-        self.initial_cooperators = rnd.sample(range(population), k = int(population/2))
+        self.cooperators = rnd.sample(range(population), k = int(population/2))
 
-    def __choose_initial_cooperators_if_asynchronous(self):
+    def __choose_cooperators_if_asynchronous(self):
         population = len(self.agents)
-        self.initial_cooperators = rnd.sample(range(population), k = 1)
+        self.cooperators = rnd.sample(range(population), k = 1)
 
-    def __choose_initial_cooperators_if_synchronous(self):
+    def __choose_cooperators_if_synchronous(self):
         population = len(self.agents)
-        self.initial_cooperators = [i for i in range(population)]
+        self.cooperators = [i for i in range(population)]
 
     def __initialize_label_A_or_B(self):
 
         population = len(self.agents)
         random_index_of_A_players = rnd.sample(range(population), k=int(population / 2))
+        print(type(random_index_of_A_players))
         for index , focal in enumerate(self.agents):
+
             if index in random_index_of_A_players:
                 focal.strategy = "A"
             else:
@@ -157,6 +167,8 @@ class Simulation:
         random_index_of_Coordinators = rnd.sample(range(population), k=coordinators_num)
         for index, focal in enumerate(self.agents):
             if index in random_index_of_Coordinators:
+                # print(index)
+
                 focal.rule = "CO"
             else:
                 focal.rule = "ANTI"
@@ -295,30 +307,38 @@ class Simulation:
             if agent.strategy!= agent.next_strategy:
                 equilibrated =0
                 break
-        if equilibrated == 1:
+        for agent in self.agents:
+            if agent.strategy=="A":
+                A_count=A_count+1
+            else:
+                B_count = B_count +1
+        # print(self.agents)
+        return equilibrated,A_count,B_count
 
-            for agent in self.agents:
-                if agent.strategy=="A":
-                    A_count=A_count+1
-                else:
-                    B_count = B_count +1
 
-            return equilibrated,A_count,B_count
 
     def one_episode(self, episode):
+        self.__initialize_label_A_or_B()
+        self.determine_coordinator_or_anticoordinator()
+        # if(self.updating_activation_sequence == "synchronous"):
+        #    active_agents =  self.__choose_cooperators_if_synchronous()
+        # elif(self.updating_activation_sequence == "asynchronous"):
+        #     active_agents = self.__choose_cooperators_if_asynchronous()
+        # else:
+        #     active_agents = self.__choose_cooperators_if_partial()
+        # print(self.agents[0])
+        # print(type(self.agents[0]))
         global new_result
         results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
                                'coordinating_fraction': [], 'time': []})
         for t in range(self.time_steps):
-            for agent in self.agents:
-                agent.decide_next_strategy(self.agents)
-            for agent in self.agents:
-                agent.update_strategy()
+            for index in self.cooperators:
+                (self.agents[index]).decide_next_strategy(self.agents)
+            for index in self.cooperators:
+                (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
             if equilibrated:
                 print(f"Equilibrated!       A = {A_count} B = {B_count} time = {t}")
-                # result = pd.DataFrame({'Eq': equilibrated,'population':self.population, 'A': A_count, 'B': B_count,
-                #                        'coordinating_fraction':self.coordinating_fraction,'time':t})
                 new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,t]],
                                           columns=['Eq','population','A','B','coordinating_fraction','time'])
 
