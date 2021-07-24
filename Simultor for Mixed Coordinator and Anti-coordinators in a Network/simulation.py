@@ -25,6 +25,7 @@ class Simulation:
         self.time_steps = 1
         self.updating_activation_sequence = None
         self.coordinating_fraction = 1/2
+        self.population = 100
     def __generate_agents(self, population, average_degree):
         if self.network_type == "lattice":
             self.network = self.__generate_lattice(population)
@@ -305,6 +306,9 @@ class Simulation:
             return equilibrated,A_count,B_count
 
     def one_episode(self, episode):
+        global new_result
+        results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
+                               'coordinating_fraction': [], 'time': []})
         for t in range(self.time_steps):
             for agent in self.agents:
                 agent.decide_next_strategy(self.agents)
@@ -312,11 +316,25 @@ class Simulation:
                 agent.update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
             if equilibrated:
-                print("Equilibrated!       A = ",A_count," B = ",B_count," time = ",t)
+                print(f"Equilibrated!       A = {A_count} B = {B_count} time = {t}")
+                # result = pd.DataFrame({'Eq': equilibrated,'population':self.population, 'A': A_count, 'B': B_count,
+                #                        'coordinating_fraction':self.coordinating_fraction,'time':t})
+                new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,t]],
+                                          columns=['Eq','population','A','B','coordinating_fraction','time'])
+
                 break
         equilibrated, A_count, B_count = self.has_equilibrated()
         if not equilibrated:
-            print("Did'nt Equilibrate!  in time ",self.time_steps," A = ", A_count, " B = ", B_count)
+            print(f"Did'nt Equilibrate!  in time {self.time_steps} A = {A_count} B = {B_count}")
+          #  result = pd.DataFrame({'Eq': equilibrated, 'population': self.population, 'A': A_count, 'B': B_count,
+                      #             'coordinating_fraction': self.coordinating_fraction, 'time': self.time_steps})
+            new_result = pd.DataFrame([[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, self.time_steps]],
+                                      columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
+
+
+        results = results.append(new_result)
+        results.to_csv(f"diagram{episode}.csv")
+
 
     #     """Run one episode"""
     #
