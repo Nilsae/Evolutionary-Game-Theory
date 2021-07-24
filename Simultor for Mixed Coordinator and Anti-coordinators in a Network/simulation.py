@@ -153,6 +153,12 @@ class Simulation:
     def determine_coordinator_or_anticoordinator(self):
         population = len(self.agents)
         coordinators_num = int(population*self.coordinating_fraction)
+        random_index_of_Coordinators = rnd.sample(range(population), k=coordinators_num)
+        for index, focal in enumerate(self.agents):
+            if index in random_index_of_Coordinators:
+                focal.rule = "CO"
+            else:
+                focal.rule = "ANTI"
     # def __count_payoff(self, Dg, Dr):
     #     """Count the payoff based on payoff matrix"""
     #
@@ -280,12 +286,38 @@ class Simulation:
     #     plt.savefig(f"snapshot_t={timestep}.png")
     #     plt.close()
     #
+    def has_equilibrated(self):
+        equilibrated = 1
+        A_count = 0
+        B_count = 0
+        for agent in self.agents:
+            if agent.strategy!= agent.next_strategy:
+                equilibrated =0
+                break
+        if equilibrated == 1:
+
+            for agent in self.agents:
+                if agent.strategy=="A":
+                    A_count=A_count+1
+                else:
+                    B_count = B_count +1
+
+            return equilibrated,A_count,B_count
+
     def one_episode(self, episode):
         for t in range(self.time_steps):
             for agent in self.agents:
                 agent.decide_next_strategy(self.agents)
             for agent in self.agents:
                 agent.update_strategy()
+            equilibrated, A_count, B_count = self.has_equilibrated()
+            if equilibrated:
+                print("Equilibrated!       A = ",A_count," B = ",B_count," time = ",t)
+                break
+        equilibrated, A_count, B_count = self.has_equilibrated()
+        if not equilibrated:
+            print("Did'nt Equilibrate!  in time ",self.time_steps," A = ", A_count, " B = ", B_count)
+
     #     """Run one episode"""
     #
     #     # result = pd.DataFrame({'Dg': [], 'Dr': [], 'Fc': []})
@@ -300,10 +332,3 @@ class Simulation:
     #             result = result.append(new_result)
 
         # result.to_csv(f"phase_diagram{episode}.csv")
-    def has_equilibrated(self):
-        equilibrated = 1
-        for agent in self.agents:
-            if agent.strategy!= agent.next_strategy:
-                equilibrated =0
-                break
-            return equilibrated

@@ -6,7 +6,7 @@ class Agent:
 
     def __init__(self):
         # self.point = 0.0
-        self.strategy = None
+        self.strategy = None # A or B
         self.next_strategy = None
         self.neighbors_id = []
         self.A_neighbors_count = 0
@@ -16,7 +16,7 @@ class Agent:
 
         total_neighbors_count = len(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
-            if agents[neighbor_id].strategy ==1:
+            if agents[neighbor_id].strategy =="A":
                 self.A_neighbors_count= self.A_neighbors_count+1
             else :
                 self.B_neighbors_count = self.B_neighbors_count+1
@@ -34,7 +34,7 @@ class Agent:
 
         total_neighbors_count = len(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
-            if agents[neighbor_id].strategy ==1:
+            if agents[neighbor_id].strategy =="A":
                 self.A_neighbors_count= self.A_neighbors_count+1
             else :
                 B_neighbors_count = self.B_neighbors_count+1
