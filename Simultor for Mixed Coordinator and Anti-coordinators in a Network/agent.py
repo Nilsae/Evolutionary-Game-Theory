@@ -12,11 +12,27 @@ class Agent():
         self.A_neighbors_count = 0
         self.B_neighbors_count = 0
         self.rule = "CO"#=type = upfate rule(coordinating , anti_coordinating
-    def __coordinating(self, agent):
+    def __coordinating(self, agents):
+
+        #         for nb_id in focal.neighbors_id:
+        #             neighbor = self.agents[nb_id]
+        #             if focal.strategy == "C" and neighbor.strategy == "C":
+        #                 focal.point += R
+        #             elif focal.strategy == "C" and neighbor.strategy == "D":
+        #                 focal.point += S
+        #             elif focal.strategy == "D" and neighbor.strategy == "C":
+        #                 focal.point += T
+        #             elif focal.strategy == "D" and neighbor.strategy == "D":
+        #                 focal.point += P
+
+
+
 
         total_neighbors_count = len(self.neighbors_id)
+        neighbors = []
         for neighbor_id in self.neighbors_id:
-            if self.strategy =="A":
+            # neighbors.append(agents[neighbor_id])
+            if agents[neighbor_id].strategy =="A":
                 self.A_neighbors_count= self.A_neighbors_count+1
             else :
                 self.B_neighbors_count = self.B_neighbors_count+1

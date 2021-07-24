@@ -54,7 +54,7 @@ class Simulation:
             rearange_edges = int(average_degree*0.5)
             self.network = nx.barabasi_albert_graph(population, rearange_edges)
 
-        agents = [Agent(    ) for id in range(population)]
+        agents = [Agent() for id in range(population)]
 
         if self.network_type == "lattice":
             n = int(np.sqrt(population))   
@@ -161,6 +161,7 @@ class Simulation:
         #     else:
         #         focal.strategy = "D"
         #     print(focal.strategy)
+        #     print(focal.rule)
     def determine_coordinator_or_anticoordinator(self):
         population = len(self.agents)
         coordinators_num = int(population*self.coordinating_fraction)
@@ -300,12 +301,15 @@ class Simulation:
     #     plt.close()
     #
     def has_equilibrated(self):
-        equilibrated = 1
+        equilibrated = 0
         A_count = 0
         B_count = 0
-        for agent in self.agents:
-            if agent.strategy!= agent.next_strategy:
-                equilibrated =0
+        # for agent in self.agents:
+        #     if agent.strategy!= agent.next_strategy:
+        #         equilibrated =0
+        for index, focal in enumerate(self.agents):
+            if focal.strategy==focal.next_strategy:
+                equilibrated = 1
                 break
         for agent in self.agents:
             if agent.strategy=="A":
@@ -329,6 +333,7 @@ class Simulation:
         # print(self.agents[0])
         # print(type(self.agents[0]))
         global new_result
+
         results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
                                'coordinating_fraction': [], 'time': []})
         for t in range(self.time_steps):
@@ -345,13 +350,12 @@ class Simulation:
                 break
         equilibrated, A_count, B_count = self.has_equilibrated()
         if not equilibrated:
-            print(f"Did'nt Equilibrate!  in time {self.time_steps} A = {A_count} B = {B_count}")
-          #  result = pd.DataFrame({'Eq': equilibrated, 'population': self.population, 'A': A_count, 'B': B_count,
-                      #             'coordinating_fraction': self.coordinating_fraction, 'time': self.time_steps})
+            print(f"Did'nt Equilibrate!{equilibrated}  in time {self.time_steps} A = {A_count} B = {B_count}")
             new_result = pd.DataFrame([[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, self.time_steps]],
                                       columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
 
-
+        # for index in range (100):
+        #     print(f"{index} {self.agents[index].strategy}")
         results = results.append(new_result)
         results.to_csv(f"diagram{episode}.csv")
 
