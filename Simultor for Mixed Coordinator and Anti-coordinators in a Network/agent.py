@@ -1,7 +1,7 @@
 import random as rnd
 import numpy as np
 
-class Agent:
+class Agent():
 
 
     def __init__(self):
@@ -16,7 +16,7 @@ class Agent:
 
         total_neighbors_count = len(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
-            if agents[neighbor_id].strategy =="A":
+            if self.strategy =="A":
                 self.A_neighbors_count= self.A_neighbors_count+1
             else :
                 self.B_neighbors_count = self.B_neighbors_count+1

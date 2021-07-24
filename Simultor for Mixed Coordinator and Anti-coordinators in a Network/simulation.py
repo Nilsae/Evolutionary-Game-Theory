@@ -54,7 +54,7 @@ class Simulation:
             rearange_edges = int(average_degree*0.5)
             self.network = nx.barabasi_albert_graph(population, rearange_edges)
 
-        agents = [Agent() for id in range(population)]
+        agents = [Agent(    ) for id in range(population)]
 
         if self.network_type == "lattice":
             n = int(np.sqrt(population))   
