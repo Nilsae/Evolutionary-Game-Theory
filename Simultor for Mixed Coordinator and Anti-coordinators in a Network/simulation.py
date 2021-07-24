@@ -301,22 +301,24 @@ class Simulation:
     #     plt.close()
     #
     def has_equilibrated(self):
-        equilibrated = 0
+        equilibrated = 1
         A_count = 0
         B_count = 0
         # for agent in self.agents:
         #     if agent.strategy!= agent.next_strategy:
         #         equilibrated =0
         for index, focal in enumerate(self.agents):
-            if focal.strategy==focal.next_strategy:
-                equilibrated = 1
+            if focal.strategy!=focal.previous_strategy:
+                equilibrated = 0
                 break
         for agent in self.agents:
             if agent.strategy=="A":
                 A_count=A_count+1
-            else:
+            elif agent.strategy=="B":
                 B_count = B_count +1
         # print(self.agents)
+        # if A_count != B_count :
+        #     equilibrated = 0
         return equilibrated,A_count,B_count
 
 
@@ -333,31 +335,51 @@ class Simulation:
         # print(self.agents[0])
         # print(type(self.agents[0]))
         global new_result
-
+        equilibrated = -1
         results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
                                'coordinating_fraction': [], 'time': []})
         for t in range(self.time_steps):
+            for index in range(self.population):
+                self.agents[index].previous_strategy = self.agents[index].strategy
             for index in self.cooperators:
                 (self.agents[index]).decide_next_strategy(self.agents)
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
-            if equilibrated:
-                print(f"Equilibrated!       A = {A_count} B = {B_count} time = {t}")
-                new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,t]],
-                                          columns=['Eq','population','A','B','coordinating_fraction','time'])
+            # A_count =0
+            # B_count =0
+            # equilibrated =0
+            # for agent in self.agents:
+            #     if agent.strategy == "A":
+            #         A_count = A_count + 1
+            #     elif agent.strategy == "B":
+            #         B_count = B_count + 1
+            #     if A_count != B_count :
+            #         equilibrated = 0
+            #     elif for
+            new_result = pd.DataFrame(
+                [[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, t]],
+                columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
+            results = results.append(new_result)
+        # equilibrated, A_count, B_count = self.has_equilibrated()
+        # if equilibrated:
+        print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {self.time_steps}")
+        new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,self.time_steps]],
+                                      columns=['Eq','population','A','B','coordinating_fraction','time'])
 
-                break
-        equilibrated, A_count, B_count = self.has_equilibrated()
-        if not equilibrated:
-            print(f"Did'nt Equilibrate!{equilibrated}  in time {self.time_steps} A = {A_count} B = {B_count}")
-            new_result = pd.DataFrame([[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, self.time_steps]],
-                                      columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
+
+        # equilibrated, A_count, B_count = self.has_equilibrated()
+        # if not equilibrated:
+        #     print(f"Did'nt Equilibrate!{equilibrated}  in time {self.time_steps} A = {A_count} B = {B_count}")
+        #     new_result = pd.DataFrame([[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, self.time_steps]],
+        #                               columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
 
         # for index in range (100):
         #     print(f"{index} {self.agents[index].strategy}")
         results = results.append(new_result)
-        results.to_csv(f"diagram{episode}.csv")
+        # results.to_csv(f"diagram{episode}.csv")
+        results.to_csv(f"diagram.csv")
+
 
 
     #     """Run one episode"""

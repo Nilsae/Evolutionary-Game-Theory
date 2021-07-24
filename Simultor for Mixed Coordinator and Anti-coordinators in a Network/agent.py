@@ -1,5 +1,6 @@
 import random as rnd
 import numpy as np
+import random
 
 class Agent():
 
@@ -8,6 +9,7 @@ class Agent():
         # self.point = 0.0
         self.strategy = None # A or B
         self.next_strategy = None
+        self.previous_strategy = None
         self.neighbors_id = []
         self.A_neighbors_count = 0
         self.B_neighbors_count = 0
@@ -62,7 +64,11 @@ class Agent():
         elif self.A_neighbors_count>1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
-            self.next_strategy = self.strategy
+            random_int =random.randint(0,1)
+            if random_int == 0:
+                self.next_strategy = "A"
+            else:
+                self.next_strategy = "B"
 
     def decide_next_strategy(self, agent):
 
