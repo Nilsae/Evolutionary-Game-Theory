@@ -55,7 +55,10 @@ class Simulation:
             rearange_edges = int(average_degree*0.5)
             self.network = nx.barabasi_albert_graph(population, rearange_edges)
 
-        agents = [Agent() for id in range(population)]
+        agents = [Agent(self.network,id) for id in range(population)]
+        # agents = []
+        # for id in range(population):
+        #     agents.append(Agent(self.network,id))
 
         if self.network_type == "lattice":
             n = int(np.sqrt(population))   
@@ -362,12 +365,14 @@ class Simulation:
         for t in range(self.time_steps):
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
+                # print(f"{self.agents[index].strategy}  a neighbors:{self.agents[index].A_neighbors_count}")
             for index in self.cooperators:
                 (self.agents[index]).decide_next_strategy(self.agents)
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
             self.__take_snapshot(t,equilibrated)
+            print("------------")
 
             # A_count =0
             # B_count =0
@@ -392,6 +397,7 @@ class Simulation:
         print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {self.time_steps}")
         new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,self.time_steps]],
                                       columns=['Eq','population','A','B','coordinating_fraction','time'])
+        print(self.network[1])
         # nx.draw(self.network)
         # plt.savefig("1.png")
         # self.__take_snapshot(self.time_steps)

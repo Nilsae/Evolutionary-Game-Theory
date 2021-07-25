@@ -1,20 +1,23 @@
 import random as rnd
 import numpy as np
 import random
-
 class Agent():
 
 
-    def __init__(self):
+    def __init__(self,network,id):
         # self.point = 0.0
         self.strategy = None # A or B
         self.next_strategy = None
         self.previous_strategy = None
         self.neighbors_id = []
-        self.A_neighbors_count = 0
-        self.B_neighbors_count = 0
+        # self.A_neighbors_count = 0
+        # self.B_neighbors_count = 0
+        self.id =id
+        self.network = network
         self.rule = "CO"#=type = upfate rule(coordinating , anti_coordinating
     def __coordinating(self, agents):
+        A_neighbors_count = 0
+        B_neighbors_count = 0
 
         #         for nb_id in focal.neighbors_id:
         #             neighbor = self.agents[nb_id]
@@ -32,36 +35,47 @@ class Agent():
 
         total_neighbors_count = len(self.neighbors_id)
         neighbors = []
+        print(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
+        # for index,focal in enumerate(agents):
+        # for neighbor_id, felan in self.network[self.id]:
             # neighbors.append(agents[neighbor_id])
             if agents[neighbor_id].strategy =="A":
-                self.A_neighbors_count= self.A_neighbors_count+1
+                A_neighbors_count= A_neighbors_count+1
             else :
-                self.B_neighbors_count = self.B_neighbors_count+1
+                B_neighbors_count = B_neighbors_count+1
         # best_neighbor_id = self.neighbors_id[np.argmax(neighbors_point)]
         # best_neighbor = agents[best_neighbor_id]
 
-        if self.A_neighbors_count>1/2*total_neighbors_count:
+        if A_neighbors_count>1/2*total_neighbors_count:
             self.next_strategy = "A"
-        elif self.A_neighbors_count<1/2*total_neighbors_count:
+        elif A_neighbors_count<1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
             self.next_strategy = self.strategy
+        # self.A_neighbors_count = 0
+        print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
+        # self.B_neighbors_count =0
 
     def __anti_coordinating(self, agents):
-
+        A_neighbors_count = 0
+        B_neighbors_count = 0
         total_neighbors_count = len(self.neighbors_id)
+        # print(self.network)
+        # print(type(self.network[self.id]))
+        print(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
+        # for neighbor_id,felan in self.network[self.id]:
             if agents[neighbor_id].strategy =="A":
-                self.A_neighbors_count= self.A_neighbors_count+1
+                A_neighbors_count= A_neighbors_count+1
             else :
-                B_neighbors_count = self.B_neighbors_count+1
+                B_neighbors_count = B_neighbors_count+1
         # best_neighbor_id = self.neighbors_id[np.argmax(neighbors_point)]
         # best_neighbor = agents[best_neighbor_id]
 
-        if self.A_neighbors_count<1/2*total_neighbors_count:
+        if A_neighbors_count<1/2*total_neighbors_count:
             self.next_strategy = "A"
-        elif self.A_neighbors_count>1/2*total_neighbors_count:
+        elif A_neighbors_count>1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
             random_int =random.randint(0,1)
@@ -69,6 +83,9 @@ class Agent():
                 self.next_strategy = "A"
             else:
                 self.next_strategy = "B"
+        # self.A_neighbors_count = 0
+        print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
+        # self.B_neighbors_count = 0
 
     def decide_next_strategy(self, agent):
 
