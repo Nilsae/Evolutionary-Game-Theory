@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
 from agent import Agent
+import time
 
 class Simulation:
     
@@ -254,52 +255,60 @@ class Simulation:
     #
     #     return fc_converged
     #
-    # def __take_snapshot(self, timestep):
-    #     if self.network_type == "lattice":
-    #         n = int(np.sqrt(len(self.agents)))
-    #         for index, focal in enumerate(self.agents):
-    #             if focal.strategy == "C":
-    #                 self.network.nodes[int(index//n), int(index%n)]["strategy"] = "C"
-    #             else:
-    #                 self.network.nodes[int(index//n), int(index%n)]["strategy"] = "D"
-    #
-    #         def color_for_lattice(i,j):
-    #             if self.network.nodes[i,j]["strategy"] == "C":
-    #                 return 'cyan'
-    #             else:
-    #                 return 'pink'
-    #
-    #         color = dict(((i, j), color_for_lattice(i,j)) for i,j in self.network.nodes())
-    #         pos = dict((n, n) for n in self.network.nodes())
-    #
-    #     else:
-    #         for index, focal in enumerate(self.agents):
-    #             if focal.strategy == "C":
-    #                 self.network.nodes[index]["strategy"] = "C"
-    #             else:
-    #                 self.network.nodes[index]["strategy"] = "D"
-    #
-    #         def color(i):
-    #             if self.network.nodes[i]["strategy"] == "C":
-    #                 return 'cyan'
-    #             else:
-    #                 return 'pink'
-    #
-    #         color =  dict((i, color(i)) for i in self.network.nodes())
-    #         if self.network_type == "ring":
-    #             pos = nx.circular_layout(self.network)
-    #
-    #         else:
-    #             pos = nx.spring_layout(self.network)
-    #
-    #     nx.draw_networkx_edges(self.network, pos)
-    #     nx.draw_networkx_nodes(self.network, pos, node_color = list(color.values()), node_size = 10)
-    #     plt.title('t={}'.format(timestep), fontsize=20)
-    #     plt.xticks([])
-    #     plt.yticks([])
-    #     plt.savefig(f"snapshot_t={timestep}.png")
-    #     plt.close()
-    #
+    def __take_snapshot(self, timestep):
+        if self.network_type == "lattice":
+            n = int(np.sqrt(len(self.agents)))
+            for index, focal in enumerate(self.agents):
+                if focal.strategy == "A":
+                    self.network.nodes[int(index//n), int(index%n)]["strategy"] = "A"
+                else:
+                    self.network.nodes[int(index//n), int(index%n)]["strategy"] = "B"
+
+            def color_for_lattice(i,j):
+                if self.network.nodes[i,j]["strategy"] == "A":
+                    return 'cyan'
+                else:
+                    return 'pink'
+
+            color = dict(((i, j), color_for_lattice(i,j)) for i,j in self.network.nodes())
+            pos = dict((n, n) for n in self.network.nodes())
+
+        else:
+            for index, focal in enumerate(self.agents):
+                if focal.strategy == "A":
+                    self.network.nodes[index]["strategy"] = "A"
+                else:
+                    self.network.nodes[index]["strategy"] = "B"
+
+            def color(i):
+                if self.network.nodes[i]["strategy"] == "A":
+                    return 'cyan'
+                else:
+                    return 'pink'
+
+            color =  dict((i, color(i)) for i in self.network.nodes())
+            if self.network_type == "ring":
+                pos = nx.circular_layout(self.network)
+
+            else:
+                pos = nx.spring_layout(self.network)
+
+        nx.draw_networkx_edges(self.network, pos)
+        nx.draw_networkx_nodes(self.network, pos, node_color = list(color.values()), node_size = 20)
+        labels = {}
+        for index, focal in enumerate(self.agents):
+            if focal.rule == "CO":
+                labels[index] = "CO"
+            else:
+                labels[index] = "ANTI"
+
+        nx.draw_networkx_labels(self.network, pos, labels, font_size=16)
+        plt.title('t={}'.format(timestep), fontsize=20)
+        plt.xticks([])
+        plt.yticks([])
+        plt.savefig(f"snapshot_t={timestep}.png")
+        plt.close()
+
     def has_equilibrated(self):
         equilibrated = 1
         A_count = 0
@@ -346,6 +355,7 @@ class Simulation:
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
+
             # A_count =0
             # B_count =0
             # equilibrated =0
@@ -361,12 +371,17 @@ class Simulation:
                 [[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, t]],
                 columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
             results = results.append(new_result)
+            # nx.draw(self.network)
+            # time.sleep(0.5)
+
         # equilibrated, A_count, B_count = self.has_equilibrated()
         # if equilibrated:
         print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {self.time_steps}")
         new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,self.time_steps]],
                                       columns=['Eq','population','A','B','coordinating_fraction','time'])
-
+        # nx.draw(self.network)
+        # plt.savefig("1.png")
+        self.__take_snapshot(self.time_steps)
 
         # equilibrated, A_count, B_count = self.has_equilibrated()
         # if not equilibrated:

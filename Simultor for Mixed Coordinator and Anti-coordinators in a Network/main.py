@@ -5,13 +5,13 @@ from simulation import Simulation
 import random
 
 def main():
-    population = 100  # Agent number
+    population = 15  # Agent number
     average_degree = 8          # Average degree of social network
     num_episode = 1            # Number of total episode in a single simulation for taking ensemble average
     network_type = "ring"    # topology of social network
     updating_activation_sequence = "synchronous"
     time_steps = 3000
-    coordinating_fraction = 1/100
+    coordinating_fraction = 2/3
     # updating_activation_sequence = "asynchronous"
     # updating_activation_sequence = "partially_synchronous"
     simulation = Simulation(population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction    )
