@@ -4,7 +4,7 @@ import random
 class Agent():
 
 
-    def __init__(self,network,id):
+    def __init__(self,network,id,Z_func):
         # self.point = 0.0
         self.strategy = None # A or B
         self.next_strategy = None
@@ -12,10 +12,11 @@ class Agent():
         self.neighbors_id = []
         # self.A_neighbors_count = 0
         # self.B_neighbors_count = 0
+        self.Z_func = Z_func
         self.id =id
         self.network = network
         self.rule = "CO"#=type = upfate rule(coordinating , anti_coordinating
-    def __coordinating(self, agents):
+    def __coordinating(self, agents,Z_func):
         A_neighbors_count = 0
         B_neighbors_count = 0
 
@@ -52,19 +53,23 @@ class Agent():
         elif A_neighbors_count<1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
-            self.next_strategy = "A"
-            # self.next_strategy = self.strategy
-        # else:
-        #     random_int =random.randint(0,1)
-        #     if random_int == 0:
-        #         self.next_strategy = "A"
-        #     else:
-        #         self.next_strategy = "B"
-        # self.A_neighbors_count = 0
+            if Z_func == "A":
+                self.next_strategy = "A"
+            elif Z_func == "previous":
+                self.next_strategy = self.strategy
+            elif Z_func == "random"  :# random
+                random_int = random.randint(0, 1)
+                if random_int == 0:
+                    self.next_strategy = "A"
+                else:
+                    self.next_strategy = "B"
+            else:
+                print("Invalid Z!")
+            self.A_neighbors_count = 0
         print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count =0
 
-    def __anti_coordinating(self, agents):
+    def __anti_coordinating(self, agents,Z_func):
         A_neighbors_count = 0
         B_neighbors_count = 0
         total_neighbors_count = len(self.neighbors_id)
@@ -85,25 +90,29 @@ class Agent():
         elif A_neighbors_count>1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
-            self.next_strategy = "A"
-            # self.next_strategy = self.strategy
-        # # else:
-        #     random_int =random.randint(0,1)
-        #     if random_int == 0:
-        #         self.next_strategy = "A"
-        #     else:
-        #         self.next_strategy = "B"
-        # self.A_neighbors_count = 0
+            if Z_func=="A":
+                self.next_strategy = "A"
+            elif Z_func == "previous":
+                self.next_strategy = self.strategy
+            elif Z_func == "random": # random
+                random_int =random.randint(0,1)
+                if random_int == 0:
+                    self.next_strategy = "A"
+                else:
+                    self.next_strategy = "B"
+            else:
+                print("Invalid Z!")
+            self.A_neighbors_count = 0
         print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count = 0
 
-    def decide_next_strategy(self, agent):
+    def decide_next_strategy(self, agent,Z_func):
 
         if self.rule == "CO":
-            self.__coordinating(agent)
+            self.__coordinating(agent,Z_func)
 
         elif self.rule == "ANTI":
-            self.__anti_coordinating(agent)
+            self.__anti_coordinating(agent,Z_func)
 
     def update_strategy(self):
         self.strategy = self.next_strategy

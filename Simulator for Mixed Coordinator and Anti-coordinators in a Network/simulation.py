@@ -8,12 +8,14 @@ import time
 
 class Simulation:
     
-    def __init__(self, population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction,dim,A_B_fraction):
+    def __init__(self, population, average_degree, network_type,updating_activation_sequence,
+                 time_steps,coordinating_fraction,dim,A_B_fraction,Z_func):
 
         self.dim = dim
         self.network_type = network_type
         self.network = None
-        self.agents = self.__generate_agents(population, average_degree)
+        self.Z_func = Z_func
+        self.agents = self.__generate_agents(population, average_degree,self.Z_func)
         # self.cooperators = self.choose
         self.time_steps = time_steps
         self.updating_activation_sequence = updating_activation_sequence
@@ -21,6 +23,10 @@ class Simulation:
         self.population = population
         self.average_degree = average_degree
         self.A_B_fraction = A_B_fraction
+
+
+
+
         if(self.updating_activation_sequence == "synchronous"):
            self.active_agents =  self.__choose_cooperators_if_synchronous()
         elif(self.updating_activation_sequence == "asynchronous"):
@@ -28,7 +34,7 @@ class Simulation:
         else:
             self.active_agents = self.__choose_cooperators_if_partial()
 
-    def __generate_agents(self, population, average_degree):
+    def __generate_agents(self, population, average_degree,Z_func):
         if self.network_type == "lattice":
             # self.network = self.__generate_lattice(population)
             self.network =nx.grid_graph(dim =self.dim)
@@ -48,7 +54,7 @@ class Simulation:
             rearange_edges = int(average_degree*0.5)
             self.network = nx.barabasi_albert_graph(population, rearange_edges)
 
-        agents = [Agent(self.network,id) for id in range(population)]
+        agents = [Agent(self.network,id,self.Z_func) for id in range(population)]
         # agents = []
         # for id in range(population):
         #     agents.append(Agent(self.network,id))
@@ -290,7 +296,7 @@ class Simulation:
                 self.agents[index].previous_strategy = self.agents[index].strategy
                 # print(f"{self.agents[index].strategy}  a neighbors:{self.agents[index].A_neighbors_count}")
             for index in self.cooperators:
-                (self.agents[index]).decide_next_strategy(self.agents)
+                (self.agents[index]).decide_next_strategy(self.agents,self.Z_func)
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
