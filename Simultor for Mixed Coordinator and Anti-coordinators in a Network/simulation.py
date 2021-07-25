@@ -329,6 +329,8 @@ class Simulation:
         for index, focal in enumerate(self.agents):
             if focal.strategy!=focal.previous_strategy:
                 equilibrated = 0
+            # elif focal.next_strategy!=focal.strategy:
+            #     equilibrated = 0
                 break
         for agent in self.agents:
             if agent.strategy=="A":
@@ -404,7 +406,7 @@ class Simulation:
         #     print(f"{index} {self.agents[index].strategy}")
         results = results.append(new_result)
         # results.to_csv(f"diagram{episode}.csv")
-        results.to_csv(f"diagram.csv")
+        results.to_csv(f"data/csv/diagram.csv")
 
 
 
