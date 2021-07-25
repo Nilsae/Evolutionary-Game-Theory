@@ -255,7 +255,7 @@ class Simulation:
     #
     #     return fc_converged
     #
-    def __take_snapshot(self, timestep):
+    def __take_snapshot(self, timestep,equilibrated):
         if self.network_type == "lattice":
             n = int(np.sqrt(len(self.agents)))
             for index, focal in enumerate(self.agents):
@@ -294,7 +294,7 @@ class Simulation:
                 pos = nx.spring_layout(self.network)
 
         nx.draw_networkx_edges(self.network, pos)
-        nx.draw_networkx_nodes(self.network, pos, node_color = list(color.values()), node_size = 20)
+        nx.draw_networkx_nodes(self.network, pos, node_color = list(color.values()), node_size = 500)
         labels = {}
         for index, focal in enumerate(self.agents):
             if focal.rule == "CO":
@@ -303,10 +303,20 @@ class Simulation:
                 labels[index] = "ANTI"
 
         nx.draw_networkx_labels(self.network, pos, labels, font_size=16)
-        plt.title('t={}'.format(timestep), fontsize=20)
+        eq_str = ""
+        if equilibrated:
+            eq_str = "Equilibrated!"
+        plt.title(f"t={timestep}  {eq_str}", fontsize=20)
+        plt.axis = "off"
+        time_past_eq = -1
+        # if equilibrated == 1:
+        #     time_past_eq = time_past_eq +1
+        #     # eq_time = timestep
+        #     fig,ax = plt.subplots()
+        #     ax.set_xlabel(f"equilibrated at time {timestep-time_past_eq} !")
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(f"snapshot_t={timestep}.png")
+        plt.savefig(f"images/snap_t={timestep}.png")
         plt.close()
 
     def has_equilibrated(self):
@@ -355,6 +365,7 @@ class Simulation:
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
+            self.__take_snapshot(t,equilibrated)
 
             # A_count =0
             # B_count =0
@@ -381,7 +392,7 @@ class Simulation:
                                       columns=['Eq','population','A','B','coordinating_fraction','time'])
         # nx.draw(self.network)
         # plt.savefig("1.png")
-        self.__take_snapshot(self.time_steps)
+        # self.__take_snapshot(self.time_steps)
 
         # equilibrated, A_count, B_count = self.has_equilibrated()
         # if not equilibrated:
