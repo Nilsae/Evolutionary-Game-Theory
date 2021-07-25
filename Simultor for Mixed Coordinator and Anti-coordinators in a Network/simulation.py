@@ -316,7 +316,7 @@ class Simulation:
         #     ax.set_xlabel(f"equilibrated at time {timestep-time_past_eq} !")
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(f"images/snap_t={timestep}.png")
+        plt.savefig(f"data/images/snap_t={timestep}.png")
         plt.close()
 
     def has_equilibrated(self):
