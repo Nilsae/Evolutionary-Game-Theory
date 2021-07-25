@@ -52,7 +52,14 @@ class Agent():
         elif A_neighbors_count<1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
-            self.next_strategy = self.strategy
+            self.next_strategy = "A"
+            # self.next_strategy = self.strategy
+        # else:
+        #     random_int =random.randint(0,1)
+        #     if random_int == 0:
+        #         self.next_strategy = "A"
+        #     else:
+        #         self.next_strategy = "B"
         # self.A_neighbors_count = 0
         print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count =0
@@ -78,11 +85,14 @@ class Agent():
         elif A_neighbors_count>1/2*total_neighbors_count:
             self.next_strategy = "B"
         else:
-            random_int =random.randint(0,1)
-            if random_int == 0:
-                self.next_strategy = "A"
-            else:
-                self.next_strategy = "B"
+            self.next_strategy = "A"
+            # self.next_strategy = self.strategy
+        # # else:
+        #     random_int =random.randint(0,1)
+        #     if random_int == 0:
+        #         self.next_strategy = "A"
+        #     else:
+        #         self.next_strategy = "B"
         # self.A_neighbors_count = 0
         print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count = 0

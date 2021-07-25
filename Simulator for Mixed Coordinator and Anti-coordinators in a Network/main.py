@@ -4,17 +4,30 @@
 from simulation import Simulation
 import random
 
+"""
+network_type has several options, give following network type as string;
+    1. lattice
+    2. ring
+    3. ER-random
+    4. Complete
+    4. Watts Strogatz(Small World)
+    5. BA-SF
+"""
+
 def main():
-    population = 3  # Agent number
+    population = 100 # Agent number
     average_degree = 8          # Average degree of social network
     num_episode = 1            # Number of total episode in a single simulation for taking ensemble average
     network_type = "ring"    # topology of social network
     updating_activation_sequence = "synchronous"
-    time_steps = 30
-    coordinating_fraction = 1/2
+    time_steps = 200
+    coordinating_fraction = 1/100
+    A_B_fraction = 1/100
+
     # updating_activation_sequence = "asynchronous"
     # updating_activation_sequence = "partially_synchronous"
-    simulation = Simulation(population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction    )
+    dim = (2,3,4)
+    simulation = Simulation(population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction  ,dim ,A_B_fraction )
 
     for episode in range(num_episode):
         random.seed()

@@ -8,17 +8,9 @@ import time
 
 class Simulation:
     
-    def __init__(self, population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction):
-        """
-        network_type has several options, give following network type as string;
-            1. lattice
-            2. ring
-            3. ER-random
-            4. Complete (Not recommended!!! Too heavy!!!)
-            4. Watts Strogatz(Small World)
-            5. BA-SF
-        """
+    def __init__(self, population, average_degree, network_type,updating_activation_sequence,time_steps,coordinating_fraction,dim,A_B_fraction):
 
+        self.dim = dim
         self.network_type = network_type
         self.network = None
         self.agents = self.__generate_agents(population, average_degree)
@@ -28,6 +20,7 @@ class Simulation:
         self.coordinating_fraction = coordinating_fraction
         self.population = population
         self.average_degree = average_degree
+        self.A_B_fraction = A_B_fraction
         if(self.updating_activation_sequence == "synchronous"):
            self.active_agents =  self.__choose_cooperators_if_synchronous()
         elif(self.updating_activation_sequence == "asynchronous"):
@@ -37,8 +30,8 @@ class Simulation:
 
     def __generate_agents(self, population, average_degree):
         if self.network_type == "lattice":
-            self.network = self.__generate_lattice(population)
-            
+            # self.network = self.__generate_lattice(population)
+            self.network =nx.grid_graph(dim =self.dim)
         elif self.network_type == "ring":
             self.network = nx.circulant_graph(population, [1])
             
@@ -59,22 +52,22 @@ class Simulation:
         # agents = []
         # for id in range(population):
         #     agents.append(Agent(self.network,id))
-
-        if self.network_type == "lattice":
-            n = int(np.sqrt(population))   
-            for index, focal in enumerate(agents):
-                neighbors_id = list(self.network[int(index//n), int(index%n)])
-                for (x,y) in neighbors_id:
-                    nb_id = int(x*n+y)
-                    focal.neighbors_id.append(nb_id)
+        #
+        # if self.network_type == "lattice":
+        #     n = int(np.sqrt(population))
+        #     for index, focal in enumerate(agents):
+        #         neighbors_id = list(self.network[int(index//n), int(index%n)])
+        #         for (x,y) in neighbors_id:
+        #             nb_id = int(x*n+y)
+        #             focal.neighbors_id.append(nb_id)
 
         # When using another topology
-        else:
-            for index, focal in enumerate(agents):
-                neighbors_id = list(self.network[index])
-                for nb_id in neighbors_id:
-                    focal.neighbors_id.append(nb_id)
-        
+        # else:
+        for index, focal in enumerate(agents):
+            neighbors_id = list(self.network[index])
+            for nb_id in neighbors_id:
+                focal.neighbors_id.append(nb_id)
+
         return agents
 
     def __generate_lattice(self, population):
@@ -146,10 +139,10 @@ class Simulation:
         population = len(self.agents)
         self.cooperators = [i for i in range(population)]
 
-    def __initialize_label_A_or_B(self):
+    def __initialize_label_A_or_B(self,A_B_fraction):
 
         population = len(self.agents)
-        random_index_of_A_players = rnd.sample(range(population), k=int(population / 2))
+        random_index_of_A_players = rnd.sample(range(population), k=int(population *A_B_fraction))
         print(type(random_index_of_A_players))
         for index , focal in enumerate(self.agents):
 
@@ -157,15 +150,7 @@ class Simulation:
                 focal.strategy = "A"
             else:
                 focal.strategy= "B"
-        """Initialize the strategy of agents"""
-        #
-        # for index, focal in enumerate(self.agents):
-        #     if index in self.initial_cooperators:
-        #         focal.strategy = "C"
-        #     else:
-        #         focal.strategy = "D"
-        #     print(focal.strategy)
-        #     print(focal.rule)
+
     def determine_coordinator_or_anticoordinator(self):
         population = len(self.agents)
         coordinators_num = int(population*self.coordinating_fraction)
@@ -177,69 +162,7 @@ class Simulation:
                 focal.rule = "CO"
             else:
                 focal.rule = "ANTI"
-    # def __count_payoff(self, Dg, Dr):
-    #     """Count the payoff based on payoff matrix"""
-    #
-    #     R = 1       # Reward
-    #     S = -Dr     # Sucker
-    #     T = 1+Dg    # Temptation
-    #     P = 0       # Punishment
-    #
-    #     for focal in self.agents:
-    #         focal.point = 0.0
-    #         for nb_id in focal.neighbors_id:
-    #             neighbor = self.agents[nb_id]
-    #             if focal.strategy == "C" and neighbor.strategy == "C":
-    #                 focal.point += R
-    #             elif focal.strategy == "C" and neighbor.strategy == "D":
-    #                 focal.point += S
-    #             elif focal.strategy == "D" and neighbor.strategy == "C":
-    #                 focal.point += T
-    #             elif focal.strategy == "D" and neighbor.strategy == "D":
-    #                 focal.point += P
 
-    # def __update_strategy(self, rule ="CO"):
-    #     for focal in self.agents:
-    #         focal.decide_next_strategy(self.agents, rule = rule)
-    #
-    #     for focal in self.agents:
-    #         focal.update_strategy()
-    #
-    # def __count_fc(self):
-    #     """Calculate the fraction of cooperative agents"""
-    #
-    #     fc = len([agent for agent in self.agents if agent.strategy == "C"])/len(self.agents)
-    #
-    #     return fc
-
-    # def __play_game(self, episode):
-
-    #     """Continue games until fc gets converged"""
-    #     tmax = 3000
-    #
-    #     self.__initialize_strategy()
-    #     initial_fc = self.__count_fc()
-    #     fc_hist = [initial_fc]
-    #     print(f"Episode:{episode}, Dr:{Dr:.1f}, Dg:{Dg:.1f}, Time: 0, Fc:{initial_fc:.3f}")
-    #     # result = pd.DataFrame({'Time': [0], 'Fc': [initial_fc]})
-    #
-    #     for t in range(1, tmax+1):
-    #         # self.__count_payoff(Dg, Dr)
-    #         self.__update_strategy(rule = "IM")
-    #         fc = self.__count_fc()
-    #         fc_hist.append(fc)
-    #         print(f"Episode:{episode}, Dr:{Dr:.1f}, Dg:{Dg:.1f}, Time:{t}, Fc:{fc:.3f}")
-    #         # new_result = pd.DataFrame([[t, fc]], columns = ['Time', 'Fc'])
-    #         # result = result.append(new_result)
-    #         converged_num=0
-    #         # Convergence conditions
-    #         if fc == 0 or fc == 1:
-    #             fc_converged = fc
-    #             converged_num = converged_num+1
-    #             comment = "Fc(0 or 1"
-    #             print(comment)
-    #             break
-    #
     #         if t >= 100 and np.absolute(np.mean(fc_hist[t-100:t-1]) - fc)/fc < 0.001:
     #             fc_converged = np.mean(fc_hist[t-99:t])
     #             comment = "Fc(converged)"
@@ -348,7 +271,7 @@ class Simulation:
 
 
     def one_episode(self, episode):
-        self.__initialize_label_A_or_B()
+        self.__initialize_label_A_or_B(self.A_B_fraction)
         self.determine_coordinator_or_anticoordinator()
         # if(self.updating_activation_sequence == "synchronous"):
         #    active_agents =  self.__choose_cooperators_if_synchronous()
@@ -374,59 +297,17 @@ class Simulation:
             self.__take_snapshot(t,equilibrated)
             print("------------")
 
-            # A_count =0
-            # B_count =0
-            # equilibrated =0
-            # for agent in self.agents:
-            #     if agent.strategy == "A":
-            #         A_count = A_count + 1
-            #     elif agent.strategy == "B":
-            #         B_count = B_count + 1
-            #     if A_count != B_count :
-            #         equilibrated = 0
-            #     elif for
             new_result = pd.DataFrame(
                 [[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, t]],
                 columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
             results = results.append(new_result)
-            # nx.draw(self.network)
-            # time.sleep(0.5)
 
-        # equilibrated, A_count, B_count = self.has_equilibrated()
-        # if equilibrated:
         print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {self.time_steps}")
         new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,self.time_steps]],
                                       columns=['Eq','population','A','B','coordinating_fraction','time'])
         print(self.network[1])
-        # nx.draw(self.network)
-        # plt.savefig("1.png")
-        # self.__take_snapshot(self.time_steps)
 
-        # equilibrated, A_count, B_count = self.has_equilibrated()
-        # if not equilibrated:
-        #     print(f"Did'nt Equilibrate!{equilibrated}  in time {self.time_steps} A = {A_count} B = {B_count}")
-        #     new_result = pd.DataFrame([[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, self.time_steps]],
-        #                               columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
-
-        # for index in range (100):
-        #     print(f"{index} {self.agents[index].strategy}")
         results = results.append(new_result)
         # results.to_csv(f"diagram{episode}.csv")
         results.to_csv(f"data/csv/diagram.csv")
 
-
-
-    #     """Run one episode"""
-    #
-    #     # result = pd.DataFrame({'Dg': [], 'Dr': [], 'Fc': []})
-    #     result = pd.DataFrame({'A_count': [], 'B_count': [], 'Fc': []})
-    #     self.__choose_initial_cooperators()
-    #
-    #     for Dr in np.arange(0, 1.1, 0.1):
-    #         for Dg in np.arange(0, 1.1, 0.1):
-    #             fc_converged = self.__play_game(episode, Dg, Dr)
-    #             # new_result = pd.DataFrame([[format(Dg, '.1f'), format(Dr, '.1f'), fc_converged]], columns = ['Dg', 'Dr', 'Fc'])
-    #             new_result = pd.DataFrame([fc_converged],columns=['Fc'])
-    #             result = result.append(new_result)
-
-        # result.to_csv(f"phase_diagram{episode}.csv")
