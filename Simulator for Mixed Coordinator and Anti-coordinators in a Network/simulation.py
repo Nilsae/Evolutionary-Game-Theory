@@ -5,6 +5,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from agent import Agent
 import time
+from csv import writer
+
+
+def append_list_as_row(file_name, list_of_elem):
+    # Open file in append mode
+    with open(file_name, 'a+', newline='') as write_obj:
+        # Create a writer object from csv module
+        csv_writer = writer(write_obj)
+        # Add contents of list as last row in the csv file
+        csv_writer.writerow(list_of_elem)
 
 class Simulation:
     
@@ -273,7 +283,7 @@ class Simulation:
 
 
 
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction):
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,results):
         self.__initialize_label_A_or_B(A_B_fraction)
         self.determine_coordinator_or_anticoordinator(coordinating_fraction)
         # if(self.updating_activation_sequence == "synchronous"):
@@ -286,8 +296,7 @@ class Simulation:
         # print(type(self.agents[0]))
         global new_result
         equilibrated = -1
-        results = pd.DataFrame({'Eq': [], 'population': [], 'A/B':[],
-                               'coordinating_fraction': [], 'equilibration time': []})
+
         equilibrated_array=[]
         for t in range(time_steps):
             for index in range(self.population):
@@ -297,9 +306,9 @@ class Simulation:
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
-            self.__take_snapshot(t,equilibrated)
+            # self.__take_snapshot(t,equilibrated)
             equilibrated_array.append(equilibrated)
-            print(".")
+
 
             # new_result = pd.DataFrame(
             #     [[equilibrated, self.population, A_B_fraction, coordinating_fraction, t]],
@@ -316,8 +325,9 @@ class Simulation:
                                       columns=['Eq','population','A/B','coordinating_fraction','equilibration time'])
         # print(new_result)
         #print(self.network)
-
-        results = results.append(new_result)
+        res_row = [equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]
+        # results = results.append(new_result)
         # results.to_csv(f"diagram{episode}.csv")
-        results.to_csv(f"data/csv/diagram.csv")
+        # results.to_csv(f"data/csv/diagram.csv")
+        append_list_as_row(f"data/csv/diagram.csv", res_row)
 
