@@ -36,7 +36,7 @@ class Agent():
 
         total_neighbors_count = len(self.neighbors_id)
         neighbors = []
-        print(self.neighbors_id)
+        # print(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
         # for index,focal in enumerate(agents):
         # for neighbor_id, felan in self.network[self.id]:
@@ -66,7 +66,7 @@ class Agent():
             else:
                 print("Invalid Z!")
             self.A_neighbors_count = 0
-        print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
+        # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count =0
 
     def __anti_coordinating(self, agents,Z_func):
@@ -75,7 +75,7 @@ class Agent():
         total_neighbors_count = len(self.neighbors_id)
         # print(self.network)
         # print(type(self.network[self.id]))
-        print(self.neighbors_id)
+        # print(self.neighbors_id)
         for neighbor_id in self.neighbors_id:
         # for neighbor_id,felan in self.network[self.id]:
             if agents[neighbor_id].strategy =="A":
@@ -103,8 +103,9 @@ class Agent():
             else:
                 print("Invalid Z!")
             self.A_neighbors_count = 0
-        print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
+        # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count = 0
+
 
     def decide_next_strategy(self, agent,Z_func):
 

@@ -286,29 +286,36 @@ class Simulation:
         # print(type(self.agents[0]))
         global new_result
         equilibrated = -1
-        results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
-                               'coordinating_fraction': [], 'time': []})
+        results = pd.DataFrame({'Eq': [], 'population': [], 'A/B':[],
+                               'coordinating_fraction': [], 'equilibration time': []})
+        equilibrated_array=[]
         for t in range(time_steps):
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
-                # print(f"{self.agents[index].strategy}  a neighbors:{self.agents[index].A_neighbors_count}")
             for index in self.cooperators:
                 (self.agents[index]).decide_next_strategy(self.agents,self.Z_func)
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
             self.__take_snapshot(t,equilibrated)
-            print("------------")
+            equilibrated_array.append(equilibrated)
+            print(".")
 
-            new_result = pd.DataFrame(
-                [[equilibrated, self.population, A_count, B_count, coordinating_fraction, t]],
-                columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
-            results = results.append(new_result)
-
-        print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {time_steps}")
-        new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,coordinating_fraction,time_steps]],
-                                      columns=['Eq','population','A','B','coordinating_fraction','time'])
-        print(self.network[1])
+            # new_result = pd.DataFrame(
+            #     [[equilibrated, self.population, A_B_fraction, coordinating_fraction, t]],
+            #     columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
+            # results = results.append(new_result)
+        eq_time = -1
+        if(equilibrated == 1):
+            for tt in range(time_steps-1,0,-1):
+                if equilibrated_array[tt]==0:
+                    eq_time = tt
+                    break
+        print(f"Equilibrated = {equilibrated}     time = {eq_time}")
+        new_result = pd.DataFrame([[equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]],
+                                      columns=['Eq','population','A/B','coordinating_fraction','equilibration time'])
+        # print(new_result)
+        #print(self.network)
 
         results = results.append(new_result)
         # results.to_csv(f"diagram{episode}.csv")
