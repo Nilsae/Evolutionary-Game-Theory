@@ -8,8 +8,7 @@ import time
 
 class Simulation:
     
-    def __init__(self, population, average_degree, network_type,updating_activation_sequence,
-                 time_steps,coordinating_fraction,dim,A_B_fraction,Z_func):
+    def __init__(self, population, average_degree, network_type,updating_activation_sequence,dim,Z_func):
 
         self.dim = dim
         self.network_type = network_type
@@ -17,12 +16,10 @@ class Simulation:
         self.Z_func = Z_func
         self.agents = self.__generate_agents(population, average_degree,self.Z_func)
         # self.cooperators = self.choose
-        self.time_steps = time_steps
         self.updating_activation_sequence = updating_activation_sequence
-        self.coordinating_fraction = coordinating_fraction
         self.population = population
         self.average_degree = average_degree
-        self.A_B_fraction = A_B_fraction
+
 
 
 
@@ -157,9 +154,9 @@ class Simulation:
             else:
                 focal.strategy= "B"
 
-    def determine_coordinator_or_anticoordinator(self):
+    def determine_coordinator_or_anticoordinator(self,coordinating_fraction):
         population = len(self.agents)
-        coordinators_num = int(population*self.coordinating_fraction)
+        coordinators_num = int(population*coordinating_fraction)
         random_index_of_Coordinators = rnd.sample(range(population), k=coordinators_num)
         for index, focal in enumerate(self.agents):
             if index in random_index_of_Coordinators:
@@ -276,9 +273,9 @@ class Simulation:
 
 
 
-    def one_episode(self, episode):
-        self.__initialize_label_A_or_B(self.A_B_fraction)
-        self.determine_coordinator_or_anticoordinator()
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction):
+        self.__initialize_label_A_or_B(A_B_fraction)
+        self.determine_coordinator_or_anticoordinator(coordinating_fraction)
         # if(self.updating_activation_sequence == "synchronous"):
         #    active_agents =  self.__choose_cooperators_if_synchronous()
         # elif(self.updating_activation_sequence == "asynchronous"):
@@ -291,7 +288,7 @@ class Simulation:
         equilibrated = -1
         results = pd.DataFrame({'Eq': [], 'population': [], 'A': [], 'B': [],
                                'coordinating_fraction': [], 'time': []})
-        for t in range(self.time_steps):
+        for t in range(time_steps):
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
                 # print(f"{self.agents[index].strategy}  a neighbors:{self.agents[index].A_neighbors_count}")
@@ -304,12 +301,12 @@ class Simulation:
             print("------------")
 
             new_result = pd.DataFrame(
-                [[equilibrated, self.population, A_count, B_count, self.coordinating_fraction, t]],
+                [[equilibrated, self.population, A_count, B_count, coordinating_fraction, t]],
                 columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
             results = results.append(new_result)
 
-        print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {self.time_steps}")
-        new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,self.coordinating_fraction,self.time_steps]],
+        print(f"Equilibrated = {equilibrated}       A = {A_count} B = {B_count} time = {time_steps}")
+        new_result = pd.DataFrame([[equilibrated,self.population,A_count,B_count,coordinating_fraction,time_steps]],
                                       columns=['Eq','population','A','B','coordinating_fraction','time'])
         print(self.network[1])
 
