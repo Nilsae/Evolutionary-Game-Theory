@@ -283,7 +283,7 @@ class Simulation:
 
 
 
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,results):
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,results,threshold):
         self.__initialize_label_A_or_B(A_B_fraction)
         self.determine_coordinator_or_anticoordinator(coordinating_fraction)
         # if(self.updating_activation_sequence == "synchronous"):
@@ -302,7 +302,7 @@ class Simulation:
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
             for index in self.cooperators:
-                (self.agents[index]).decide_next_strategy(self.agents,self.Z_func)
+                (self.agents[index]).decide_next_strategy(self.agents,self.Z_func,threshold)
             for index in self.cooperators:
                 (self.agents[index]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
