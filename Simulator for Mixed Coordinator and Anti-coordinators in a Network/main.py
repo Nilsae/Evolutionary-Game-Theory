@@ -38,30 +38,35 @@ def main():
                            'coordinating_fraction': [], 'equilibration time': []})
     non_eq = pd.DataFrame({'list': [], 'Eq': [], 'population': [], 'A/B': [],
                            'coordinating_fraction': [], 'equilibration time': []})
-    for population_co in range(population+1): # to population
-        data = itertools.combinations(selection, population_co)
-        sublists = list(data)
+    for population in range(1,30):
+        for population_co in range(population+1): # to population
+            data = itertools.combinations(selection, population_co)
 
-        for i in range(len(sublists)):
 
-            co_list = sublists[i]
+            sublists = list(data)
 
-            simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
-            random.seed()
-            new_result,equilibrated = simulation.one_episode(episode, A_B_fraction, time_steps, coordinating_fraction, result,non_eq, threshold,
-                                   co_list)
-            result = result.append(new_result)
-            if equilibrated== 0 :
-                non_eq = non_eq.append(new_result)
-    # simulation = Simulation(population, average_degree, network_type,updating_activation_sequence  ,dim ,Z_func )
-    # results = pd.DataFrame({'Eq': [], 'population': [], 'A/B': [],
-    #                         'coordinating_fraction': [], 'equilibration time': []})
-    # for episode in range(num_episode):
-        # A_B_fraction = 1/(episode +1)
-        # population = population +100
-        # simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
-    result.to_csv(f"data/csv/total.csv")
-    non_eq.to_csv(f"data/csv/non_eq.csv")
+            for i in range(len(sublists)):
+
+                co_list = sublists[i]
+
+
+
+                simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+                random.seed()
+                new_result,equilibrated = simulation.one_episode(episode, A_B_fraction, time_steps, coordinating_fraction, result,non_eq, threshold,
+                                       co_list)
+                result = result.append(new_result)
+                if equilibrated== 0 :
+                    non_eq = non_eq.append(new_result)
+        # simulation = Simulation(population, average_degree, network_type,updating_activation_sequence  ,dim ,Z_func )
+        # results = pd.DataFrame({'Eq': [], 'population': [], 'A/B': [],
+        #                         'coordinating_fraction': [], 'equilibration time': []})
+        # for episode in range(num_episode):
+            # A_B_fraction = 1/(episode +1)
+            # population = population +100
+            # simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+        result.to_csv(f"data/csv/total{population}.csv")
+        non_eq.to_csv(f"data/csv/non_eq{population}.csv")
     # felan = pd.read_csv(f"data/csv/diagram.csv")
     # print(felan)
 if __name__ == '__main__':

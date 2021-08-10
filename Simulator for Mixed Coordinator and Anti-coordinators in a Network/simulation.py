@@ -328,9 +328,15 @@ class Simulation:
                 if equilibrated_array[tt]==0:
                     eq_time = tt
                     break
+        list_to_show = []
+        for i in range(self.population):
+            if i in co_list:
+                list_to_show.append("C")
+            else:
+                list_to_show.append("A")
 
         new_result = pd.DataFrame(
-            {'list': [co_list], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
+            {'list': [list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
              'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
         # if (equilibrated == 0):
             # non_eq =  non_eq.append(new_result)
