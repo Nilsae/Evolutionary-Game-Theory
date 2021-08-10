@@ -4,7 +4,7 @@
 from simulation import Simulation
 import random
 import  pandas as pd
-
+import itertools
 """
 network_type options:
     1. lattice
@@ -21,26 +21,48 @@ Z_func options:
 """
 
 def main():
-    population = 20 # Agent number
+    population = 8 # Agent number
     average_degree = 8          # Average degree of social network
-    num_episode = 30     # Number of total episode in a single simulation for taking ensemble average
+    num_episode = 1    # Number of total episode in a single simulation for taking ensemble average
     network_type = "ring"    # topology of social network
-    updating_activation_sequence = "synchronous"
+    updating_activation_sequence = "asynchronous"
     time_steps = 70
     coordinating_fraction = 1/2
     A_B_fraction = 1/2
     threshold = 1/2
-    Z_func = "previous"
-    dim = (2,3,4)
-    simulation = Simulation(population, average_degree, network_type,updating_activation_sequence  ,dim ,Z_func )
-    results = pd.DataFrame({'Eq': [], 'population': [], 'A/B': [],
-                            'coordinating_fraction': [], 'equilibration time': []})
-    for episode in range(num_episode):
-        # A_B_fraction = 1/(episode +1)
-        population = population +100
-        simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
-        random.seed()
-        simulation.one_episode(episode,A_B_fraction,time_steps,coordinating_fraction,results,threshold)
+    Z_func = "A"
+    dim = (2,3,1)
+    episode =1
+    selection = [i for i in range(population)]
+    result = pd.DataFrame({'list': [], 'Eq': [], 'population': [], 'A/B': [],
+                           'coordinating_fraction': [], 'equilibration time': []})
+    non_eq = pd.DataFrame({'list': [], 'Eq': [], 'population': [], 'A/B': [],
+                           'coordinating_fraction': [], 'equilibration time': []})
+    for population_co in range(population+1): # to population
+        data = itertools.combinations(selection, population_co)
+        sublists = list(data)
 
+        for i in range(len(sublists)):
+
+            co_list = sublists[i]
+
+            simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+            random.seed()
+            new_result,equilibrated = simulation.one_episode(episode, A_B_fraction, time_steps, coordinating_fraction, result,non_eq, threshold,
+                                   co_list)
+            result = result.append(new_result)
+            if equilibrated== 0 :
+                non_eq = non_eq.append(new_result)
+    # simulation = Simulation(population, average_degree, network_type,updating_activation_sequence  ,dim ,Z_func )
+    # results = pd.DataFrame({'Eq': [], 'population': [], 'A/B': [],
+    #                         'coordinating_fraction': [], 'equilibration time': []})
+    # for episode in range(num_episode):
+        # A_B_fraction = 1/(episode +1)
+        # population = population +100
+        # simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+    result.to_csv(f"data/csv/total.csv")
+    non_eq.to_csv(f"data/csv/non_eq.csv")
+    # felan = pd.read_csv(f"data/csv/diagram.csv")
+    # print(felan)
 if __name__ == '__main__':
     main()

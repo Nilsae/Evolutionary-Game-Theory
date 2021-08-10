@@ -6,15 +6,16 @@ import pandas as pd
 from agent import Agent
 import time
 from csv import writer
+import itertools
 
-
-def append_list_as_row(file_name, list_of_elem):
-    # Open file in append mode
-    with open(file_name, 'a+', newline='') as write_obj:
-        # Create a writer object from csv module
-        csv_writer = writer(write_obj)
-        # Add contents of list as last row in the csv file
-        csv_writer.writerow(list_of_elem)
+#
+# def append_list_as_row(file_name, list_of_elem):
+#     # Open file in append mode
+#     with open(file_name, 'a+', newline='') as write_obj:
+#         # Create a writer object from csv module
+#         csv_writer = writer(write_obj)
+#         # Add contents of list as last row in the csv file
+#         csv_writer.writerow(list_of_elem)
 
 class Simulation:
     
@@ -43,8 +44,8 @@ class Simulation:
 
     def __generate_agents(self, population, average_degree,Z_func):
         if self.network_type == "lattice":
-            # self.network = self.__generate_lattice(population)
-            self.network =nx.grid_graph(dim =self.dim)
+            self.network = self.__generate_lattice(population)
+            # self.network =nx.grid_2d_graph(5,5)
         elif self.network_type == "ring":
             self.network = nx.circulant_graph(population, [1])
             
@@ -61,36 +62,36 @@ class Simulation:
             rearange_edges = int(average_degree*0.5)
             self.network = nx.barabasi_albert_graph(population, rearange_edges)
 
-        agents = [Agent(self.network,id,self.Z_func) for id in range(population)]
+        agents = [Agent(self.network,id,self.Z_func) for i in range(population)]
         # agents = []
         # for id in range(population):
         #     agents.append(Agent(self.network,id))
         #
-        # if self.network_type == "lattice":
-        #     n = int(np.sqrt(population))
-        #     for index, focal in enumerate(agents):
-        #         neighbors_id = list(self.network[int(index//n), int(index%n)])
-        #         for (x,y) in neighbors_id:
-        #             nb_id = int(x*n+y)
-        #             focal.neighbors_id.append(nb_id)
+        if self.network_type == "lattice":
+            n = int(np.sqrt(population))
+            for index, focal in enumerate(agents):
+                neighbors_id = list(self.network[int(index//n), int(index%n)])
+                for (x,y) in neighbors_id:
+                    nb_id = int(x*n+y)
+                    focal.neighbors_id.append(nb_id)
 
         # When using another topology
-        # else:
-        for index, focal in enumerate(agents):
-            neighbors_id = list(self.network[index])
-            for nb_id in neighbors_id:
-                focal.neighbors_id.append(nb_id)
+        else:
+            for index, focal in enumerate(agents):
+                neighbors_id = list(self.network[index])
+                for nb_id in neighbors_id:
+                    focal.neighbors_id.append(nb_id)
 
         return agents
 
     def __generate_lattice(self, population):
         """
-        Default Lattice has only 4 adges(vertical&horizontal), so adding 4 edges in diagonal direction and 
+        Default Lattice has only 4 adges(vertical&horizontal), so adding 4 edges in diagonal direction and
         Set periodic boundary condition
         """
 
         n = int(np.sqrt(population))    # n×n lattice is generated
-        G = nx.grid_graph(dim = [n,n]) 
+        G = nx.grid_graph(dim = [n,n])
 
         # Add diagonal edge except for outer edge agent
         for i in range(1,n-1):
@@ -107,37 +108,37 @@ class Simulation:
             G.add_edge((0,j), (n-1,j-1))
             G.add_edge((0,j), (1,j-1))
             G.add_edge((0,j), (1,j+1))
-        
+
         # Add edge along j=0, i=1~n-2
-        for i in range(1,n-1): 
+        for i in range(1,n-1):
             G.add_edge((i,0), (i,n-1))
             G.add_edge((i,0), (i-1,n-1))
             G.add_edge((i,0), (i+1,n-1))
             G.add_edge((i,0), (i+1,1))
-    
+
         # Add edge along j=0
         G.add_edge((0,0), (n-1,0))
         G.add_edge((0,0), (n-1,0+1))
         G.add_edge((0,0), (n-1,n-1))
         G.add_edge((0,0), (0,n-1))
         G.add_edge((0,0), (1,n-1))
-  
+
         # Add edge along j=n-1
         G.add_edge((0,n-1), (n-1,n-1))
         G.add_edge((0,n-1), (n-1,0))
         G.add_edge((0,n-1), (n-1,n-2))
         G.add_edge((0,n-1), (0,0))
-    
+
         # Add edge along i=n-1
         G.add_edge((n-1,0), (0,0))
         G.add_edge((n-1,0), (0,1))
         G.add_edge((n-1,0), (0,n-1))
         G.add_edge((n-1,0), (n-1,n-1))
         G.add_edge((n-1,0), (n-2,n-1))
-           
+
         # Upper right edge agent
         G.add_edge((n-1,n-2),(n-2,n-1))
-        
+
         return G
 
     def __choose_cooperators_if_partial(self):
@@ -156,7 +157,7 @@ class Simulation:
 
         population = len(self.agents)
         random_index_of_A_players = rnd.sample(range(population), k=int(population *A_B_fraction))
-        print(type(random_index_of_A_players))
+        # print(type(random_index_of_A_players))
         for index , focal in enumerate(self.agents):
 
             if index in random_index_of_A_players:
@@ -164,17 +165,22 @@ class Simulation:
             else:
                 focal.strategy= "B"
 
-    def determine_coordinator_or_anticoordinator(self,coordinating_fraction):
-        population = len(self.agents)
-        coordinators_num = int(population*coordinating_fraction)
-        random_index_of_Coordinators = rnd.sample(range(population), k=coordinators_num)
+    def determine_coordinator_or_anticoordinator(self,coordinating_fraction,co_list):
+        # population = len(self.agents)
+        # selection = [i for i in range(population)]
+        # coordinators_num = int(population*coordinating_fraction)
+        # random_index_of_Coordinators = rnd.sample(range(population), k=coordinators_num)
+        # for population_co in range(population+1): # to population
+            # total_co_set = # every state with current population_co
+            # data = itertools.combinations(selection, population_co)
+            # sublists = list(data)
+            # i = 0
         for index, focal in enumerate(self.agents):
-            if index in random_index_of_Coordinators:
-                # print(index)
-
+            if index in co_list:
                 focal.rule = "CO"
             else:
                 focal.rule = "ANTI"
+            # i= i+1
 
     #         if t >= 100 and np.absolute(np.mean(fc_hist[t-100:t-1]) - fc)/fc < 0.001:
     #             fc_converged = np.mean(fc_hist[t-99:t])
@@ -282,10 +288,10 @@ class Simulation:
         return equilibrated,A_count,B_count
 
 
-
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,results,threshold):
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list):
         self.__initialize_label_A_or_B(A_B_fraction)
-        self.determine_coordinator_or_anticoordinator(coordinating_fraction)
+        self.determine_coordinator_or_anticoordinator(coordinating_fraction,co_list)
+
         # if(self.updating_activation_sequence == "synchronous"):
         #    active_agents =  self.__choose_cooperators_if_synchronous()
         # elif(self.updating_activation_sequence == "asynchronous"):
@@ -294,7 +300,7 @@ class Simulation:
         #     active_agents = self.__choose_cooperators_if_partial()
         # print(self.agents[0])
         # print(type(self.agents[0]))
-        global new_result
+        # global new_result,result,non_eq
         equilibrated = -1
 
         equilibrated_array=[]
@@ -315,19 +321,52 @@ class Simulation:
             #     columns=['Eq', 'population', 'A', 'B', 'coordinating_fraction', 'time'])
             # results = results.append(new_result)
         eq_time = -1
+
         if(equilibrated == 1):
+            eq_time =0
             for tt in range(time_steps-1,0,-1):
                 if equilibrated_array[tt]==0:
                     eq_time = tt
                     break
+
+        new_result = pd.DataFrame(
+            {'list': [co_list], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
+             'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
+        # if (equilibrated == 0):
+            # non_eq =  non_eq.append(new_result)
+            # non_eq.to_csv("data/csv/diagram_non_eqs.csv")
+            # with open(f"data/csv/diagram_non_eqs.csv", 'a') as f_object:
+            #     writer_object = writer(f_object)
+            #     writer_object.writerow(new_result)
+            #     f_object.close()
         print(f"Equilibrated = {equilibrated}     time = {eq_time}")
-        new_result = pd.DataFrame([[equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]],
-                                      columns=['Eq','population','A/B','coordinating_fraction','equilibration time'])
+        # new_result = pd.DataFrame([[co_list,equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]],
+        #                               columns=['list','Eq','population','A/B','coordinating_fraction','equilibration time'])
+
         # print(new_result)
+        # new_result = pd.DataFrame({'list':[co_list],'Eq':equilibrated,'population':self.population,'A/B':A_B_fraction,'coordinating_fraction':coordinating_fraction,'equilibration time':eq_time})
+        # a = pd.DataFrame({'year': [2019], 'make': ["Mercedes"], 'model': ["C-Class"]})
+        # print(new_result)
+        # result.append(new_result)
         #print(self.network)
-        res_row = [equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]
-        # results = results.append(new_result)
+        # res_row = [equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]
+
+        # columns = ['list', 'Eq', 'population', 'A/B', 'coordinating_fraction', 'equilibration time']
+        # csv_file = pd.read_csv(f"data/csv/diagram.csv",names = columns)
+        # result.append(new_result)
+        # result.to_csv(f"data/csv/diagram.csv")
+        return new_result,equilibrated
+        # with open(f"data/csv/diagram.csv", 'a') as f_object:
+        #     writer_object = writer(f_object)
+        #     writer_object.writerow(new_result)
+        #     f_object.close()
+        #
+        # with open(f"data/csv/diagram_non_eqs.csv", 'a') as f_object:
+        #     writer_object = writer(f_object)
+        #     writer_object.writerow(new_result)
+        #     f_object.close()
+
         # results.to_csv(f"diagram{episode}.csv")
         # results.to_csv(f"data/csv/diagram.csv")
-        append_list_as_row(f"data/csv/diagram.csv", res_row)
+        # append_list_as_row(f"data/csv/diagram.csv", res_row)
 
