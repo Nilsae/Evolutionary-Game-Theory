@@ -288,7 +288,7 @@ class Simulation:
         return equilibrated,A_count,B_count
 
 
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list):
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list,a_list):
         self.__initialize_label_A_or_B(A_B_fraction)
         self.determine_coordinator_or_anticoordinator(coordinating_fraction,co_list)
 
@@ -328,15 +328,22 @@ class Simulation:
                 if equilibrated_array[tt]==0:
                     eq_time = tt
                     break
-        list_to_show = []
+        co_list_to_show = []
+        a_list_to_show = []
         for i in range(self.population):
             if i in co_list:
-                list_to_show.append("C")
+                co_list_to_show.append("C")
             else:
-                list_to_show.append("A")
+                co_list_to_show.append("A")
+
+        for i in range(self.population):
+            if i in a_list:
+                a_list_to_show.append("A")
+            else:
+                a_list_to_show.append("B")
 
         new_result = pd.DataFrame(
-            {'list': [list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
+            {'co_list': [co_list_to_show],'a_list':[a_list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
              'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
         # if (equilibrated == 0):
             # non_eq =  non_eq.append(new_result)
@@ -345,7 +352,7 @@ class Simulation:
             #     writer_object = writer(f_object)
             #     writer_object.writerow(new_result)
             #     f_object.close()
-        print(f"Equilibrated = {equilibrated}     time = {eq_time}")
+        # print(f"Equilibrated = {equilibrated}     time = {eq_time}")
         # new_result = pd.DataFrame([[co_list,equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]],
         #                               columns=['list','Eq','population','A/B','coordinating_fraction','equilibration time'])
 
