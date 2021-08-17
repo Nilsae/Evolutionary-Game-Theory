@@ -21,7 +21,7 @@ Z_func options:
 """
 
 def main():
-    population = 8 # Agent number
+    population = 7 # Agent number
     average_degree = 8          # Average degree of social network
     num_episode = 1    # Number of total episode in a single simulation for taking ensemble average
     network_type = "ring"    # topology of social network

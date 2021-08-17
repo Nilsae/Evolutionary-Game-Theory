@@ -345,7 +345,7 @@ class Simulation:
             #     writer_object = writer(f_object)
             #     writer_object.writerow(new_result)
             #     f_object.close()
-        print(f"Equilibrated = {equilibrated}     time = {eq_time}")
+        # print(f"Equilibrated = {equilibrated}     time = {eq_time}")
         # new_result = pd.DataFrame([[co_list,equilibrated,self.population,A_B_fraction,coordinating_fraction,eq_time]],
         #                               columns=['list','Eq','population','A/B','coordinating_fraction','equilibration time'])
 
