@@ -285,17 +285,15 @@ class Simulation:
             else:
                 a_list_to_show.append("B")
 
-
         new_result = pd.DataFrame(
-            {'co_list': [co_list_to_show],'a_list': [a_list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
-             'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
+            {'Eq': [equilibrated], 'co_list': [co_list_to_show], 'a_list': [a_list_to_show],
+             'population': [self.population], 'equilibration time': [eq_time]})
 
-        # if equilibrated == 0:
-        #     # this new_result is obviously new_result_non_eq but for simplicity was not renamed
-        #     new_result = pd.DataFrame(
-        #         {'co_list': [co_list_to_show],'a_list': [a_list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
-        #          'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
-        #     print(new_result)
-        print(new_result)
-        return new_result, equilibrated
+        if equilibrated == 0:
+            # this new_result is obviously new_result_non_eq but for simplicity was not renamed
+            new_result = pd.DataFrame(
+                {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show],  'population': [self.population],  'equilibration time': [eq_time]})
+            print(new_result)
+        # print(new_result)
+        return  equilibrated
 

@@ -33,38 +33,37 @@ def main():
     Z_func = "A"
     dim = (2,3,1)
     episode =1
-    selection = [i for i in range(population)]
-    result = pd.DataFrame({'list': [], 'Eq': [], 'population': [], 'A/B': [],
-                           'coordinating_fraction': [], 'equilibration time': []})
-    non_eq = pd.DataFrame({'list': [], 'Eq': [], 'population': [], 'A/B': [],
-                           'coordinating_fraction': [], 'equilibration time': []})
-    # for population in range(1,30):
-    print(f'population = {population}\n')
-    for population_co in range(population+1): # to population
-        data_co = itertools.combinations(selection, population_co)
+
+    result = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
+    non_eq = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
+    for population in range(1,30):
+        selection = [i for i in range(population)]
+        print(f'population = {population}\n')
+        for population_co in range(population+1): # to population
+            data_co = itertools.combinations(selection, population_co)
 
 
-        sublists_co = list(data_co)
+            sublists_co = list(data_co)
 
-        for i in range(len(sublists_co)):
+            for i in range(len(sublists_co)):
 
-            co_list = sublists_co[i]
+                co_list = sublists_co[i]
 
 
-            for population_a in range(population +1):
-                data_a = itertools.combinations(selection, population_a)
-                sublists_a = list(data_a)
-                for i in range(len(sublists_a)):
-                    a_list = sublists_a[i]
-                    simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
-                    random.seed()
-                    new_result,equilibrated = simulation.one_episode(episode, A_B_fraction, time_steps, coordinating_fraction, result,non_eq, threshold,
-                                           co_list,a_list)
-                    result = result.append(new_result)
-                    # if equilibrated== 0 :
-                    #     non_eq = non_eq.append(new_result)
-    result.to_csv(f"data/csv/total{population}.csv")
-    # non_eq.to_csv(f"data/csv/non_eq{population}.csv")
+                for population_a in range(population +1):
+                    data_a = itertools.combinations(selection, population_a)
+                    sublists_a = list(data_a)
+                    for i in range(len(sublists_a)):
+                        a_list = sublists_a[i]
+                        simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+                        random.seed()
+                        equilibrated = simulation.one_episode(episode, A_B_fraction, time_steps, coordinating_fraction, result,non_eq, threshold,
+                                               co_list,a_list)
+                        # result = result.append(new_result)
+                        # if equilibrated== 0 :
+                        #     non_eq = non_eq.append(new_result)
+        # result.to_csv(f"data/csv/total{population}.csv")
+        # non_eq.to_csv(f"data/csv/non_eq{population}.csv")
 
 if __name__ == '__main__':
     main()
