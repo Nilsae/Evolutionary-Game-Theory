@@ -142,14 +142,14 @@ class Simulation:
         population = len(self.agents)
         self.cooperators = [i for i in range(population)]
 
-    def __initialize_label_A_or_B(self,A_B_fraction):
+    def __initialize_label_A_or_B(self,A_B_fraction,a_list):
 
         population = len(self.agents)
         random_index_of_A_players = rnd.sample(range(population), k=int(population *A_B_fraction))
         # print(type(random_index_of_A_players))
         for index , focal in enumerate(self.agents):
 
-            if index in random_index_of_A_players:
+            if index in a_list:
                 focal.strategy = "A"
             else:
                 focal.strategy= "B"
@@ -244,8 +244,8 @@ class Simulation:
         return equilibrated,A_count,B_count
 
 
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list):
-        self.__initialize_label_A_or_B(A_B_fraction)
+    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list,a_list):
+        self.__initialize_label_A_or_B(A_B_fraction,a_list)
         self.determine_coordinator_or_anticoordinator(coordinating_fraction,co_list)
 
 
@@ -272,25 +272,30 @@ class Simulation:
                 if equilibrated_array[tt]==0:
                     eq_time = tt
                     break
-        list_to_show = []
+        co_list_to_show = []
+        a_list_to_show= []
         for i in range(self.population):
             if i in co_list:
-                list_to_show.append("C")
+                co_list_to_show.append("C")
             else:
-                list_to_show.append("A")
+                co_list_to_show.append("A")
+        for i in range(self.population):
+            if i in a_list:
+                a_list_to_show.append("A")
+            else:
+                a_list_to_show.append("B")
 
-        # new_result = pd.DataFrame(
-        #     {'list': [list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
-        #      'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
-        #
-        if equilibrated == 0:
-            # this new_result is obviously new_result_non_eq but for simplicity was not renamed
-            new_result = pd.DataFrame(
-                {'list': [list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
-                 'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
-            print(new_result)
-        # print(new_result)
-        return \
-            #new_result,
-        equilibrated
+
+        new_result = pd.DataFrame(
+            {'co_list': [co_list_to_show],'a_list': [a_list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
+             'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
+
+        # if equilibrated == 0:
+        #     # this new_result is obviously new_result_non_eq but for simplicity was not renamed
+        #     new_result = pd.DataFrame(
+        #         {'co_list': [co_list_to_show],'a_list': [a_list_to_show], 'Eq': [equilibrated], 'population': [self.population], 'A/B': [A_B_fraction],
+        #          'coordinating_fraction': [coordinating_fraction], 'equilibration time': [eq_time]})
+        #     print(new_result)
+        print(new_result)
+        return new_result, equilibrated
 
