@@ -20,17 +20,6 @@ class Agent():
         A_neighbors_count = 0
         B_neighbors_count = 0
 
-        #         for nb_id in focal.neighbors_id:
-        #             neighbor = self.agents[nb_id]
-        #             if focal.strategy == "C" and neighbor.strategy == "C":
-        #                 focal.point += R
-        #             elif focal.strategy == "C" and neighbor.strategy == "D":
-        #                 focal.point += S
-        #             elif focal.strategy == "D" and neighbor.strategy == "C":
-        #                 focal.point += T
-        #             elif focal.strategy == "D" and neighbor.strategy == "D":
-        #                 focal.point += P
-
 
 
 
