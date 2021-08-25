@@ -252,10 +252,12 @@ class Simulation:
         equilibrated = -1
 
         equilibrated_array=[]
+        last_a_list= []
         for t in range(time_steps):
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
-
+                if(t == time_steps-1):
+                  last_a_list.append(self.agents[index].strategy)
             index = rnd.sample(range(self.population), k = 1)
 
             # for index in self.cooperators:
@@ -282,14 +284,14 @@ class Simulation:
                 co_list_to_show.append("+")
             else:
                 co_list_to_show.append("-")
-        for i in range(self.population):
-            if i in a_list:
-                a_list_to_show.append("A")
-            else:
-                a_list_to_show.append("B")
+        # for i in range(self.population):
+        #     if i in a_list:
+        #         a_list_to_show.append("A")
+        #     else:
+        #         a_list_to_show.append("B")
 
         new_result = pd.DataFrame(
-            {'Eq': [equilibrated], 'co_list': [co_list_to_show], 'a_list': [a_list_to_show],
+            {'Eq': [equilibrated], 'co_list': [co_list_to_show], 'a_list': [last_a_list],
              'population': [self.population], 'equilibration time': [eq_time]})
 
         if equilibrated == 0:

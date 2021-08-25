@@ -38,7 +38,7 @@ def main():
 
     result = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     non_eq = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
-    for population in range(1,16):
+    for population in range(5,6):
         selection = [i for i in range(population)]
         print(f'population = {population}\n')
         for population_co in range(population+1): # to population
