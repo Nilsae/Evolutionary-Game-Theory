@@ -37,24 +37,28 @@ class Agent():
         # best_neighbor_id = self.neighbors_id[np.argmax(neighbors_point)]
         # best_neighbor = agents[best_neighbor_id]
 
-        if A_neighbors_count>threshold*total_neighbors_count:
+        # if A_neighbors_count>threshold*total_neighbors_count:
+        #     self.next_strategy = "A"
+        # elif A_neighbors_count<threshold*total_neighbors_count:
+        #     self.next_strategy = "B"
+        # else:
+        #     if Z_func == "A":
+        #         self.next_strategy = "A"
+        #     elif Z_func == "previous":
+        #         self.next_strategy = self.strategy
+        #     elif Z_func == "random"  :# random
+        #         random_int = random.randint(0, 1)
+        #         if random_int == 0:
+        #             self.next_strategy = "A"
+        #         else:
+        #             self.next_strategy = "B"
+        #     else:
+        #         print("Invalid Z!")
+        #     self.A_neighbors_count = 0
+        if A_neighbors_count>=B_neighbors_count:
             self.next_strategy = "A"
-        elif A_neighbors_count<threshold*total_neighbors_count:
-            self.next_strategy = "B"
         else:
-            if Z_func == "A":
-                self.next_strategy = "A"
-            elif Z_func == "previous":
-                self.next_strategy = self.strategy
-            elif Z_func == "random"  :# random
-                random_int = random.randint(0, 1)
-                if random_int == 0:
-                    self.next_strategy = "A"
-                else:
-                    self.next_strategy = "B"
-            else:
-                print("Invalid Z!")
-            self.A_neighbors_count = 0
+            self.next_strategy = "B"
         # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count =0
 
@@ -74,30 +78,35 @@ class Agent():
         # best_neighbor_id = self.neighbors_id[np.argmax(neighbors_point)]
         # best_neighbor = agents[best_neighbor_id]
 
-        if A_neighbors_count<threshold*total_neighbors_count:
+        # if A_neighbors_count<threshold*total_neighbors_count:
+        #     self.next_strategy = "A"
+        # elif A_neighbors_count>threshold*total_neighbors_count:
+        #     self.next_strategy = "B"
+        # else:
+        #     if Z_func=="A":
+        #         self.next_strategy = "A"
+        #     elif Z_func == "previous":
+        #         self.next_strategy = self.strategy
+        #     elif Z_func == "random": # random
+        #         random_int =random.randint(0,1)
+        #         if random_int == 0:
+        #             self.next_strategy = "A"
+        #         else:
+        #             self.next_strategy = "B"
+        #     else:
+        #         print("Invalid Z!")
+        #     self.A_neighbors_count = 0
+        print("anei = ",A_neighbors_count,"bnei = ",B_neighbors_count)
+        if A_neighbors_count<=B_neighbors_count:
             self.next_strategy = "A"
-        elif A_neighbors_count>threshold*total_neighbors_count:
-            self.next_strategy = "B"
         else:
-            if Z_func=="A":
-                self.next_strategy = "A"
-            elif Z_func == "previous":
-                self.next_strategy = self.strategy
-            elif Z_func == "random": # random
-                random_int =random.randint(0,1)
-                if random_int == 0:
-                    self.next_strategy = "A"
-                else:
-                    self.next_strategy = "B"
-            else:
-                print("Invalid Z!")
-            self.A_neighbors_count = 0
+            self.next_strategy = "B"
         # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count = 0
 
 
     def decide_next_strategy(self, agent,Z_func,threshold):
-
+        print("rule = ",self.rule,"\n")
         if self.rule == "CO":
             self.__coordinating(agent,Z_func,threshold)
 

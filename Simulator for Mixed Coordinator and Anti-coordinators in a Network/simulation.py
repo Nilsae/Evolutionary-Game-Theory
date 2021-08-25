@@ -27,12 +27,12 @@ class Simulation:
 
 
 
-        if(self.updating_activation_sequence == "synchronous"):
-           self.active_agents =  self.__choose_cooperators_if_synchronous()
-        elif(self.updating_activation_sequence == "asynchronous"):
-            self.active_agents = self.__choose_cooperators_if_asynchronous()
-        else:
-            self.active_agents = self.__choose_cooperators_if_partial()
+        # if(self.updating_activation_sequence == "synchronous"):
+        #    self.active_agents =  self.__choose_cooperators_if_synchronous()
+        # elif(self.updating_activation_sequence == "asynchronous"):
+        #     self.active_agents = self.__choose_cooperators_if_asynchronous()
+        # else:
+        #     self.active_agents = self.__choose_cooperators_if_partial()
 
     def __generate_agents(self, population, average_degree,Z_func):
         if self.network_type == "lattice":
@@ -40,7 +40,7 @@ class Simulation:
             # self.network =nx.grid_2d_graph(5,5)
         elif self.network_type == "ring":
             self.network = nx.circulant_graph(population, [1])
-            
+
         elif self.network_type == "ER":
             self.network = nx.random_regular_graph(average_degree, population)
         
@@ -130,22 +130,22 @@ class Simulation:
 
         return G
 
-    def __choose_cooperators_if_partial(self):
-        population = len(self.agents)
-        self.cooperators = rnd.sample(range(population), k = int(population/2))
+    # def __choose_cooperators_if_partial(self):
+    #     population = len(self.agents)
+    #     self.cooperators = rnd.sample(range(population), k = int(population/2))
+    #
+    # def __choose_cooperators_if_asynchronous(self):
+    #     population = len(self.agents)
+    #     self.cooperators = rnd.sample(range(population), k = 1)
+    #
+    # def __choose_cooperators_if_synchronous(self):
+    #     population = len(self.agents)
+    #     self.cooperators = [i for i in range(population)]
 
-    def __choose_cooperators_if_asynchronous(self):
-        population = len(self.agents)
-        self.cooperators = rnd.sample(range(population), k = 1)
-
-    def __choose_cooperators_if_synchronous(self):
-        population = len(self.agents)
-        self.cooperators = [i for i in range(population)]
-
-    def __initialize_label_A_or_B(self,A_B_fraction,a_list):
+    def __initialize_label_A_or_B(self,a_list):
 
         population = len(self.agents)
-        random_index_of_A_players = rnd.sample(range(population), k=int(population *A_B_fraction))
+        # random_index_of_A_players = rnd.sample(range(population), k=int(population *A_B_fraction))
         # print(type(random_index_of_A_players))
         for index , focal in enumerate(self.agents):
 
@@ -154,7 +154,7 @@ class Simulation:
             else:
                 focal.strategy= "B"
 
-    def determine_coordinator_or_anticoordinator(self,coordinating_fraction,co_list):
+    def determine_coordinator_or_anticoordinator(self,co_list):
 
         for index, focal in enumerate(self.agents):
             if index in co_list:
@@ -244,9 +244,9 @@ class Simulation:
         return equilibrated,A_count,B_count
 
 
-    def one_episode(self, episode,A_B_fraction,time_steps,coordinating_fraction,result,non_eq,threshold,co_list,a_list):
-        self.__initialize_label_A_or_B(A_B_fraction,a_list)
-        self.determine_coordinator_or_anticoordinator(coordinating_fraction,co_list)
+    def one_episode(self, episode,time_steps,result,non_eq,threshold,co_list,a_list):
+        self.__initialize_label_A_or_B(a_list)
+        self.determine_coordinator_or_anticoordinator(co_list)
 
 
         equilibrated = -1
@@ -255,12 +255,15 @@ class Simulation:
         for t in range(time_steps):
             for index in range(self.population):
                 self.agents[index].previous_strategy = self.agents[index].strategy
-            for index in self.cooperators:
-                (self.agents[index]).decide_next_strategy(self.agents,self.Z_func,threshold)
-            for index in self.cooperators:
-                (self.agents[index]).update_strategy()
+
+            index = rnd.sample(range(self.population), k = 1)
+
+            # for index in self.cooperators:
+            (self.agents[index[0]]).decide_next_strategy(self.agents,self.Z_func,threshold)
+            # for index in self.cooperators:
+            (self.agents[index[0]]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
-            # self.__take_snapshot(t,equilibrated)
+            self.__take_snapshot(t,equilibrated)
             equilibrated_array.append(equilibrated)
 
 
@@ -294,6 +297,6 @@ class Simulation:
             new_result = pd.DataFrame(
                 {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show],  'population': [self.population],  'equilibration time': [eq_time]})
             print(new_result)
-        # print(new_result)
+        print(new_result)
         return  new_result,equilibrated
 
