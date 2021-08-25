@@ -263,7 +263,7 @@ class Simulation:
             # for index in self.cooperators:
             (self.agents[index[0]]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
-            self.__take_snapshot(t,equilibrated)
+            # self.__take_snapshot(t,equilibrated)
             equilibrated_array.append(equilibrated)
 
 
@@ -279,9 +279,9 @@ class Simulation:
         a_list_to_show= []
         for i in range(self.population):
             if i in co_list:
-                co_list_to_show.append("C")
+                co_list_to_show.append("+")
             else:
-                co_list_to_show.append("A")
+                co_list_to_show.append("-")
         for i in range(self.population):
             if i in a_list:
                 a_list_to_show.append("A")
@@ -298,5 +298,5 @@ class Simulation:
                 {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show],  'population': [self.population],  'equilibration time': [eq_time]})
             print(new_result)
         print(new_result)
-        return  new_result,equilibrated
+        return  new_result,equilibrated, eq_time
 

@@ -96,7 +96,7 @@ class Agent():
         #     else:
         #         print("Invalid Z!")
         #     self.A_neighbors_count = 0
-        print("anei = ",A_neighbors_count,"bnei = ",B_neighbors_count)
+        # print("anei = ",A_neighbors_count,"bnei = ",B_neighbors_count)
         if A_neighbors_count<=B_neighbors_count:
             self.next_strategy = "A"
         else:
@@ -106,7 +106,7 @@ class Agent():
 
 
     def decide_next_strategy(self, agent,Z_func,threshold):
-        print("rule = ",self.rule,"\n")
+        # print("rule = ",self.rule,"\n")
         if self.rule == "CO":
             self.__coordinating(agent,Z_func,threshold)
 
