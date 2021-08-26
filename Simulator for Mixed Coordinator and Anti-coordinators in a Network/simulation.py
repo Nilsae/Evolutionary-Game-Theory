@@ -298,7 +298,7 @@ class Simulation:
             # this new_result is obviously new_result_non_eq but for simplicity was not renamed
             new_result = pd.DataFrame(
                 {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show],  'population': [self.population],  'equilibration time': [eq_time]})
-            print(new_result)
-        print(new_result)
+        #     print(new_result)
+        # print(new_result)
         return  new_result,equilibrated, eq_time
 

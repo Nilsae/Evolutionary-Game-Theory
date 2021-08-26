@@ -21,7 +21,7 @@ Z_func options:
 """
 
 def main():
-    population = 10 # Agent number
+    population = 9 # Agent number
     average_degree = 8          # Average degree of social network
     num_episode = 1    # Number of total episode in a single simulation for taking ensemble average
     network_type = "ring"    # topology of social network
@@ -34,11 +34,12 @@ def main():
     dim = (2,3,1)
     episode =1
 
-
-
+    equilibrable= 0
+    nonable_res = []
+    nonables =pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     result = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     non_eq = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
-    for population in range(5,6):
+    for population in range(1,15):
         selection = [i for i in range(population)]
         print(f'population = {population}\n')
         for population_co in range(population+1): # to population
@@ -50,35 +51,68 @@ def main():
             for i in range(len(sublists_co)):
 
                 co_list = sublists_co[i]
-    # co_list = [0,5,10]
 
-    # for population_a in range(population +1):
-    #     data_a = itertools.combinations(selection, population_a)
-    #     sublists_a = list(data_a)
-    #     for i in range(len(sublists_a)):
-    #         a_list = sublists_a[i]
-                a_list = [1,3,5,7,9]
 
-                simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
-                # random.seed()
-                new_result,equilibrated,eq_time = simulation.one_episode(episode, time_steps,result,non_eq, threshold,
-                                       co_list,a_list)
-                result = result.append(new_result)
-                if equilibrated== 0 or eq_time>150:
-                    non_eq = non_eq.append(new_result)
+                for population_a in range(population +1):
+                    data_a = itertools.combinations(selection, population_a)
+                    sublists_a = list(data_a)
+                    for i in range(len(sublists_a)):
+                        a_list = sublists_a[i]
+                        # a_list = [1,3,5,7,9]
+
+                        simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+                        # random.seed()
+                        new_result,equilibrated,eq_time = simulation.one_episode(episode, time_steps,result,non_eq, threshold,
+                                               co_list,a_list)
+                        nonable_res = new_result
+                        # result = result.append(new_result)
+                        if equilibrated==1 and eq_time<140:
+                            equilibrable =1
+                            # non_eq = non_eq.append(new_result)
+                if equilibrable == 0:
+                    nonables.append (nonable_res)
+                    print(nonable_res)
+
+                equilibrable =0
+
         # simulation = Simulation(population, average_degree, network_type,updating_activation_sequence  ,dim ,Z_func )
         # results = pd.DataFrame({'Eq': [], 'poppd.set_option("display.max_rows", None, "display.max_columns", None)ulation': [], 'A/B': [],
         #                         'coordinating_fraction': [], 'equilibration time': []})
         # for episode in range(num_episode):
             # A_B_fraction = 1/(episode +1)
             # population = population +100
-
-
+    # ##################################################################################################################
+    # sign_co_list =['+', '-', '-', '-', '-', '-', '-', '+', '-']
+    # co_list = []
+    # for index,value in enumerate(sign_co_list):
+    #     if sign_co_list[index]=='+':
+    #         co_list.append(index)
+    # equilibrable= 0
+    # # co_list = [0,3]
+    # # a_list = [1, 3, 5, 7, 9]
+    # selection = [i for i in range(population)]
+    # for population_a in range(population +1):
+    #     data_a = itertools.combinations(selection, population_a)
+    #     sublists_a = list(data_a)
+    #     for i in range(len(sublists_a)):
+    #         a_list = sublists_a[i]
+    #         simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
+    #         # random.seed()
+    #         new_result,equilibrated,eq_time = simulation.one_episode(episode, time_steps,result,non_eq, threshold,
+    #                                co_list,a_list)
+    #         result = result.append(new_result)
+    #         if equilibrated== 0 or eq_time>150:
+    #             non_eq = non_eq.append(new_result)
+    #         else:
+    #             equilibrable = 1
 
             # simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
 # pd.set_option("display.max_rows", None, "display.max_columns", None)
-        result.to_csv(f"data/csv/total.csv")
-        non_eq.to_csv(f"data/csv/non_eq.csv")
+    result.to_csv(f"data/csv/total.csv")
+    non_eq.to_csv(f"data/csv/non_eq.csv")
+    nonables.tocsv(f"data/csv/non-equilibrable")
+    if equilibrable ==0:
+        print("*********************non-equilibrable************************8")
     # felan = pd.read_csv(f"data/csv/diagram.csv")
     # print(felan)
 if __name__ == '__main__':
