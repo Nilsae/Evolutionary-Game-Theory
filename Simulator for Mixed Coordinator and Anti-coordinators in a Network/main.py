@@ -35,7 +35,9 @@ def main():
     episode =1
 
     equilibrable= 0
+    always_equilibrates = 1
     nonable_res = []
+    always_eq = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     nonables =pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     result = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
     non_eq = pd.DataFrame({'Eq': [],'co_list': [],'a_list': [],  'population': [], 'equilibration time': []})
@@ -108,9 +110,10 @@ def main():
 
             # simulation = Simulation(population, average_degree, network_type, updating_activation_sequence, dim, Z_func)
 # pd.set_option("display.max_rows", None, "display.max_columns", None)
-    result.to_csv(f"data/csv/total.csv")
-    non_eq.to_csv(f"data/csv/non_eq.csv")
+#     result.to_csv(f"data/csv/total.csv")
+#     non_eq.to_csv(f"data/csv/non_eq.csv")
     nonables.tocsv(f"data/csv/non-equilibrable")
+    always_eq.to_csv(f"data/csv/always_equilibrates")
     if equilibrable ==0:
         print("*********************non-equilibrable************************8")
     # felan = pd.read_csv(f"data/csv/diagram.csv")
