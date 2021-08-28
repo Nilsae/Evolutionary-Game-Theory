@@ -41,6 +41,9 @@ class Simulation:
         elif self.network_type == "ring":
             self.network = nx.circulant_graph(population, [1])
 
+        elif self.network_type == "random_tree":
+            self.network = nx.random_tree(population)
+
         elif self.network_type == "ER":
             self.network = nx.random_regular_graph(average_degree, population)
         
@@ -205,9 +208,9 @@ class Simulation:
         labels = {}
         for index, focal in enumerate(self.agents):
             if focal.rule == "CO":
-                labels[index] = "CO"
+                labels[index] = f"{index},CO"
             else:
-                labels[index] = "ANTI"
+                labels[index] = f"{index},ANTI"
 
         nx.draw_networkx_labels(self.network, pos, labels, font_size=16)
         eq_str = ""
@@ -219,7 +222,7 @@ class Simulation:
 
         plt.xticks([])
         plt.yticks([])
-        plt.savefig(f"data/images/snap_t={timestep}.png")
+        plt.savefig(f"data/images/snap_t={timestep}.png", dpi = 300)
         plt.close()
 
     def has_equilibrated(self):
@@ -259,14 +262,15 @@ class Simulation:
                 if(t == time_steps-1):
                   last_a_list.append(self.agents[index].strategy)
             index = rnd.sample(range(self.population), k = 1)
+            if index!=0 and index!= self.population-1:
 
-            # for index in self.cooperators:
-            (self.agents[index[0]]).decide_next_strategy(self.agents,self.Z_func,threshold)
-            # for index in self.cooperators:
-            (self.agents[index[0]]).update_strategy()
-            equilibrated, A_count, B_count = self.has_equilibrated()
-            # self.__take_snapshot(t,equilibrated)
-            equilibrated_array.append(equilibrated)
+                # for index in self.cooperators:
+                (self.agents[index[0]]).decide_next_strategy(self.agents,self.Z_func,threshold)
+                # for index in self.cooperators:
+                (self.agents[index[0]]).update_strategy()
+                equilibrated, A_count, B_count = self.has_equilibrated()
+                # self.__take_snapshot(t,equilibrated)
+                equilibrated_array.append(equilibrated)
 
 
         eq_time = -1
