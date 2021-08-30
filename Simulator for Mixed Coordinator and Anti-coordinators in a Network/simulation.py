@@ -262,15 +262,15 @@ class Simulation:
                 if(t == time_steps-1):
                   last_a_list.append(self.agents[index].strategy)
             index = rnd.sample(range(self.population), k = 1)
-            if index!=0 and index!= self.population-1:
+            # if index!=0 and index!= self.population-1:
 
-                # for index in self.cooperators:
-                (self.agents[index[0]]).decide_next_strategy(self.agents,self.Z_func,threshold)
-                # for index in self.cooperators:
-                (self.agents[index[0]]).update_strategy()
-                equilibrated, A_count, B_count = self.has_equilibrated()
-                # self.__take_snapshot(t,equilibrated)
-                equilibrated_array.append(equilibrated)
+            # for index in self.cooperators:
+            (self.agents[index[0]]).decide_next_strategy(self.agents,self.Z_func,threshold)
+            # for index in self.cooperators:
+            (self.agents[index[0]]).update_strategy()
+            equilibrated, A_count, B_count = self.has_equilibrated()
+            self.__take_snapshot(t,equilibrated)
+            equilibrated_array.append(equilibrated)
 
 
         eq_time = -1
