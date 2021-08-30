@@ -44,6 +44,10 @@ class Simulation:
         elif self.network_type == "random_tree":
             self.network = nx.random_tree(population)
 
+        elif self.network_type == "full_r_ary":
+            r=2
+            self.network = nx.full_rary_tree(r, population, create_using=None)
+
         elif self.network_type == "ER":
             self.network = nx.random_regular_graph(average_degree, population)
         
@@ -269,7 +273,7 @@ class Simulation:
             # for index in self.cooperators:
             (self.agents[index[0]]).update_strategy()
             equilibrated, A_count, B_count = self.has_equilibrated()
-            self.__take_snapshot(t,equilibrated)
+            # self.__take_snapshot(t,equilibrated)
             equilibrated_array.append(equilibrated)
 
 
