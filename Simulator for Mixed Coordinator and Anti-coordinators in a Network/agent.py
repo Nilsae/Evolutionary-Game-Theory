@@ -16,6 +16,7 @@ class Agent():
         self.id =id
         self.network = network
         self.rule = "CO"#=type = upfate rule(coordinating , anti_coordinating
+        self.binary_threshold = "normal"
     def __coordinating(self, agents,Z_func,threshold):
         A_neighbors_count = 0
         B_neighbors_count = 0
@@ -55,10 +56,16 @@ class Agent():
         #     else:
         #         print("Invalid Z!")
         #     self.A_neighbors_count = 0
-        if A_neighbors_count>=B_neighbors_count:
-            self.next_strategy = "A"
+        if self.binary_threshold =="normal":
+            if A_neighbors_count >= B_neighbors_count:
+                self.next_strategy = "A"
+            else:
+                self.next_strategy = "B"
         else:
-            self.next_strategy = "B"
+            if A_neighbors_count>B_neighbors_count:
+                self.next_strategy = "A"
+            else:
+                self.next_strategy = "B"
         # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count =0
 
@@ -97,10 +104,16 @@ class Agent():
         #         print("Invalid Z!")
         #     self.A_neighbors_count = 0
         # print("anei = ",A_neighbors_count,"bnei = ",B_neighbors_count)
-        if A_neighbors_count<=B_neighbors_count:
-            self.next_strategy = "A"
+        if self.binary_threshold == "normal":
+            if A_neighbors_count <= B_neighbors_count:
+                self.next_strategy = "A"
+            else:
+                self.next_strategy = "B"
         else:
-            self.next_strategy = "B"
+            if A_neighbors_count<B_neighbors_count:
+                self.next_strategy = "A"
+            else:
+                self.next_strategy = "B"
         # print(f"{self.strategy}  a neighbors:{A_neighbors_count}")
         # self.B_neighbors_count = 0
 

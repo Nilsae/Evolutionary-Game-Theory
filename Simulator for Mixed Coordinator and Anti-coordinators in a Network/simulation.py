@@ -169,6 +169,13 @@ class Simulation:
             else:
                 focal.rule = "ANTI"
 
+    def determine_threshold_binary(self,het_list):
+        for index, focal in enumerate(self.agents):
+            if index in het_list:
+                focal.binary_threshold = "ab"
+            else:
+                focal.binary_threshold = "normal"
+
     def __take_snapshot(self, timestep,equilibrated):
         if self.network_type == "lattice":
             n = int(np.sqrt(len(self.agents)))
@@ -251,9 +258,10 @@ class Simulation:
         return equilibrated,A_count,B_count
 
 
-    def one_episode(self, episode,time_steps,result,non_eq,threshold,co_list,a_list):
+    def one_episode(self, episode,time_steps,result,non_eq,threshold,co_list,a_list,het_list):
         self.__initialize_label_A_or_B(a_list)
         self.determine_coordinator_or_anticoordinator(co_list)
+        self.determine_threshold_binary(het_list)
 
 
         equilibrated = -1
@@ -287,11 +295,17 @@ class Simulation:
                     break
         co_list_to_show = []
         a_list_to_show= []
+        het_list_to_show = []
         for i in range(self.population):
             if i in co_list:
                 co_list_to_show.append("+")
             else:
                 co_list_to_show.append("-")
+        for i in range(self.population):
+            if i in het_list:
+                het_list_to_show.append("Q")
+            else:
+                het_list_to_show.append("o")
         # for i in range(self.population):
         #     if i in a_list:
         #         a_list_to_show.append("A")
@@ -299,13 +313,13 @@ class Simulation:
         #         a_list_to_show.append("B")
 
         new_result = pd.DataFrame(
-            {'Eq': [equilibrated], 'co_list': [co_list_to_show], 'a_list': [last_a_list],
+            {'Eq': [equilibrated], 'co_list': [co_list_to_show], 'a_list': [last_a_list], 'het_list':[het_list_to_show],
              'population': [self.population], 'equilibration time': [eq_time]})
 
         if equilibrated == 0:
             # this new_result is obviously new_result_non_eq but for simplicity was not renamed
             new_result = pd.DataFrame(
-                {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show],  'population': [self.population],  'equilibration time': [eq_time]})
+                {'Eq': [equilibrated],'co_list': [co_list_to_show],'a_list': [a_list_to_show], 'het_list':[het_list_to_show], 'population': [self.population],  'equilibration time': [eq_time]})
         #     print(new_result)
         # print(new_result)
         return  new_result,equilibrated, eq_time
