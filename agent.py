@@ -25,7 +25,7 @@ class Agent():
             else:
                 B_neighbors_count = B_neighbors_count + 1
         # if self.binary_threshold =="normal":
-        print("co: " + str(A_neighbors_count) + " As and " + str(B_neighbors_count) + " Bs")
+        #         print("co: "+str(A_neighbors_count)+" As and "+str(B_neighbors_count)+" Bs")
         if A_neighbors_count >= B_neighbors_count:
             self.next_strategy = "A"
         else:
@@ -41,7 +41,7 @@ class Agent():
             else:
                 B_neighbors_count = B_neighbors_count + 1
         # if self.binary_threshold == "normal":
-        print("anti: " + str(A_neighbors_count) + " As and " + str(B_neighbors_count) + " Bs")
+        #         print("anti: "+str(A_neighbors_count)+" As and "+str(B_neighbors_count)+" Bs")
         if A_neighbors_count <= B_neighbors_count:
             self.next_strategy = "A"
         else:

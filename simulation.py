@@ -3,10 +3,11 @@ import random as rnd
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
-from agent import Agent
 import time
 from csv import writer
 import itertools
+from agent import Agent
+
 
 
 def plus(idd, number, population):
@@ -39,7 +40,7 @@ class Simulation:
         agents = [Agent(self.network, self.Z_func, i) for i in range(self.population)]
         for index, focal in enumerate(agents):
             neighbors_id = list(self.network[index])
-            print(neighbors_id)
+            #             print(neighbors_id)
             for nb_id in neighbors_id:
                 focal.neighbors_id.append(nb_id)
         return agents
@@ -114,36 +115,40 @@ class Simulation:
         equilibrated = -1
         equilibrated_array = []
         current_strategy_list = self.strategy_list
+        prev_i = -2
         for t in range(time_steps):
-            for f in self.agents:
-                print("id: " + str(f.id) + " type: " + f.type + " strategy: " + f.strategy + " willing to be: " + str(
-                    f.next_strategy))
+            #             for f in self.agents:
+            #                 print("id: "+ str(f.id)+" type: "+f.type+" strategy: "+f.strategy+" willing to be: "+str(f.next_strategy))
             for i in range(self.population):
                 self.agents[i].previous_strategy = self.agents[i].strategy
                 # if(t == time_steps-1):
 
                 (self.agents[i]).decide_next_strategy(self.agents, self.Z_func, threshold)
-                print("next strategy in this timestep is decided for everyone!")
+                #                 print("next strategy in this timestep is decided for everyone!")
                 current_strategy_list[i] = self.agents[i].strategy
                 reached_desired = (self.strategy_list == current_strategy_list)
             # RANDOM AGENT TO BE ACTIVATED
             # index_list = rnd.sample(range(self.population), k = 1)#########GGG#####
             # index = index_list[0]
             # AGENT TO BE ACTIVATED UNDER OUR POLICY:
-            index = self.activate_policy()
-            print("in this timestep agent to be activated and updated has been selected: agent " + str(index))
+            index = self.activate_policy(prev_i)
+            prev_i = index
+            print("in timestep " + str(t) + " selected: agent " + str(index))
 
             # if index!=0 and index!= self.population-1:
             if index != -1:
                 # for index in self.cooperators: (everybody is cooperating)
                 #                 (self.agents[index]).decide_next_strategy(self.agents, self.Z_func, threshold)
-                print("selected agent next strategy: " + self.agents[index].next_strategy)
+                #                 print("selected agent next strategy: "+self.agents[index].next_strategy )
                 # for index in self.cooperators:
                 (self.agents[index]).update_strategy()
                 # self.agents[index].next_strategy = (self.agents[index]).strategy
             else:
                 print("no one found\n")
-                break
+                #                 if self.has_equilibrated():
+                #                     break
+                #                 else:
+                self.activated_list = np.zeros(self.population)
             equilibrated = self.has_equilibrated()
             self.__take_snapshot(t, equilibrated)
             print("selected agent : " + str(index))
@@ -156,14 +161,14 @@ class Simulation:
              'equilibration time': [eq_time]})
         return new_result, equilibrated, eq_time, reached_desired
 
-    def activate_policy(self):
+    def activate_policy(self, prev_i):
         c1 = []
         c2 = []
         c3 = []
         for agent in self.agents:
             w = (agent.strategy == self.desired_eq[agent.id])
             B = (agent.strategy != agent.next_strategy)
-            print("w=" + str(w), "B = " + str(B))
+            #             print("w="+str(w),"B = "+str(B))
             if B == 1:
                 if agent.strategy == 'B' and agent.type == '+' \
                         and (self.strategy_list[plus(agent.id, 1, self.population)] == 'A' \
@@ -195,16 +200,16 @@ class Simulation:
                         c2.append(agent.id)
         print("c1: " + str(c1) + " c2: " + str(c2) + " c3: " + str(c3))
         for i in range(self.population):
-            if i in c1:
-                self.activated_list[i] = 1
+            if i in c1 and i != prev_i:
+                self.activated_list[i] = self.activated_list[i] + 1
                 return i
         for i in range(self.population):
-            if i in c2 and self.activated_list[i] == 0:
-                self.activated_list[i] = 1
+            if i in c2 and self.activated_list[i] < 2 and i != prev_i:
+                self.activated_list[i] = self.activated_list[i] + 1
                 return i
         for i in range(self.population):
-            if i in c3:
-                self.activated_list[i] = 1
+            if i in c3 and i != prev_i:
+                self.activated_list[i] = self.activated_list[i] + 1
                 return i
 
         return -1
