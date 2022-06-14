@@ -18,8 +18,8 @@ def main():
     global new_result
     result = pd.DataFrame({'reached_desired?': [],'Equilibrated?': [],'types': [],'initial strategy set': [],'final strategy set': [],'equilibration time': []})
     # algorithm does not work on(pop=9): (loops :))
-    desired_eq = ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A'] #desired equilibrium strategy of the agents
-    type_list = ['+', '+', '-', '-', '-', '+', '-', '-', '-'] #coordinator or anticoordinator listed identified by + and - signs
+    desired_eq =       ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A'] #desired equilibrium strategy of the agents
+    type_list =        ['+', '+', '-', '-', '-', '+', '-', '-', '-'] #coordinator or anticoordinator listed identified by + and - signs
     initial_strategy  =['B', 'A', 'B', 'A', 'A', 'A', 'A', 'A', 'A'] #initial strategy of the agents
     #it works on: (original example ;))
 #     desired_eq = ['A', 'B', 'A', 'A', 'B', 'A', 'A', 'A']  # desired equilibrium strategy of the agents
