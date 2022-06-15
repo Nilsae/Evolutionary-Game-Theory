@@ -1,3 +1,4 @@
+from agent import Agent
 import numpy as np
 import random as rnd
 import networkx as nx
@@ -6,8 +7,6 @@ import pandas as pd
 import time
 from csv import writer
 import itertools
-from agent import Agent
-
 
 
 def plus(idd, number, population):
@@ -25,7 +24,7 @@ def minus(idd, number, population):
 
 
 class Simulation:
-    def __init__(self, population, z_func, strategy_list, type_list, activated_list, desired_eq):
+    def __init__(self, population, z_func, strategy_list, type_list, activated_list, desired_eq, initial_string):
         self.network = None
         self.Z_func = z_func
         self.population = population
@@ -34,6 +33,7 @@ class Simulation:
         self.activated_list = activated_list
         self.desired_eq = desired_eq
         self.agents = self.__generate_agents()
+        self.initial_string = initial_string
 
     def __generate_agents(self):
         self.network = nx.circulant_graph(self.population, [1])  # ring only
@@ -117,6 +117,8 @@ class Simulation:
         current_strategy_list = self.strategy_list
         prev_i = -2
         for t in range(time_steps):
+            print("current: " + str(current_strategy_list))
+
             #             for f in self.agents:
             #                 print("id: "+ str(f.id)+" type: "+f.type+" strategy: "+f.strategy+" willing to be: "+str(f.next_strategy))
             for i in range(self.population):
@@ -145,10 +147,11 @@ class Simulation:
                 # self.agents[index].next_strategy = (self.agents[index]).strategy
             else:
                 print("no one found\n")
-                #                 if self.has_equilibrated():
-                #                     break
-                #                 else:
-                self.activated_list = np.zeros(self.population)
+                if self.has_equilibrated():
+                    print("final:   " + str(current_strategy_list))
+                    break
+            #                 else:
+            #                 self.activated_list = np.zeros(self.population)
             equilibrated = self.has_equilibrated()
             self.__take_snapshot(t, equilibrated)
             print("selected agent : " + str(index))
@@ -157,7 +160,7 @@ class Simulation:
 
         new_result = pd.DataFrame(
             {'reached_desired?': [reached_desired], 'Equilibrated?': [equilibrated], 'types': [self.type_list],
-             'initial strategy set': [self.strategy_list], 'final strategy set': [current_strategy_list],
+             'initial strategy set': self.initial_string, 'final strategy set': [current_strategy_list],
              'equilibration time': [eq_time]})
         return new_result, equilibrated, eq_time, reached_desired
 
@@ -196,19 +199,23 @@ class Simulation:
                 else:
                     if w == 0:
                         c1.append(agent.id)
-                    else:
+                    elif agent.type == '+':
                         c2.append(agent.id)
+        #         for f in c3:
+        #             if w==1:
+        #                 c3.drop(f)
         print("c1: " + str(c1) + " c2: " + str(c2) + " c3: " + str(c3))
+        print("agents activated so far: " + str(self.activated_list))
         for i in range(self.population):
             if i in c1 and i != prev_i:
                 self.activated_list[i] = self.activated_list[i] + 1
                 return i
         for i in range(self.population):
-            if i in c2 and self.activated_list[i] < 2 and i != prev_i:
+            if i in c2 and self.activated_list[i] <= 2 and i != prev_i:
                 self.activated_list[i] = self.activated_list[i] + 1
                 return i
         for i in range(self.population):
-            if i in c3 and i != prev_i:
+            if i in c3 and i != prev_i and self.activated_list[i] <= 3:
                 self.activated_list[i] = self.activated_list[i] + 1
                 return i
 
