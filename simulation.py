@@ -153,7 +153,7 @@ class Simulation:
             #                 else:
             #                 self.activated_list = np.zeros(self.population)
             equilibrated = self.has_equilibrated()
-            self.__take_snapshot(t, equilibrated)
+            # self.__take_snapshot(t, equilibrated)
             print("selected agent : " + str(index))
             equilibrated_array.append(equilibrated)
         eq_time = -1

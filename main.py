@@ -11,37 +11,83 @@ from pandas import concat
 
 def main():
     population = 9  # number of agents
-    num_episode = 1  # Number of total episode in a single simulation for taking ensemble average
     time_steps = 30
     threshold = 1 / 2
     Z_func = "A"  # the next strategy if number of A-playing neighbors equlas B-playing ones
-    always_equilibrates = 1
     global new_result
     result = pd.DataFrame(
         {'reached_desired?': [], 'Equilibrated?': [], 'types': [], 'initial strategy set': [], 'final strategy set': [],
          'equilibration time': []})
     # algorithm works on:
-    desired_eq = ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A']  # desired equilibrium strategy of the agents
-    type_list = ['+', '+', '-', '-', '-', '+', '-', '-',
-                 '-']  # coordinator or anticoordinator listed identified by + and - signs
-    initial_strategy = ['B', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A']  # initial strategy of the agents
-    init = str(initial_strategy)
+    # desired_eq = ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A']  # desired equilibrium strategy of the agents
+    # type_list = ['+', '+', '-', '-', '-', '+', '-', '-',
+    #              '-']  # coordinator or anticoordinator listed identified by + and - signs
+    # initial_strategy = ['B', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A']  # initial strategy of the agents
 
     # it also works on: (original example ;))
     #     desired_eq = ['A', 'B', 'A', 'A', 'B', 'A', 'A', 'A']  # desired equilibrium strategy of the agents
     #     type_list = ['+', '-', '-', '+', '-', '-', '+', '+']  # coordinator or anticoordinator listed identified by + and - signs
     #     initial_strategy = ['B', 'B', 'B', 'B', 'B', 'B', 'B','B']  # initial strategy of the agents# selection = [i for i in range(population)]
+    # brute force:
+    for population in range(5, 6):
+        selection_co = [i for i in range(population)]
+        for population_co in range(population + 1):  # to population
+            data_co = itertools.combinations(selection_co, population_co)
+            sublists_co = list(data_co)
+            for i in range(len(sublists_co)):
+                co_list = sublists_co[i]
+                type_list = []
+                co_num = 0
+                for j in range(population):
+                    if j in co_list:
+                        type_list.append("+")
+                        co_num = co_num + 1
+                    else:
+                        type_list.append("-")
 
-    # selection = [i for i in range(population)]
-    activated_list = zeros(population)
-    simulation = Simulation(population, Z_func, initial_strategy, type_list, activated_list, desired_eq, init)
-    new_result, equilibrated, eq_time, reached_desired = simulation.one_episode(time_steps, threshold)
-    #     result = pd.DataFrame.from_records
-    result = result.append(new_result)
+                selection_desired_eq = [i for i in range(population - co_num)]
+                for population_desired_eq in range(population - co_num + 1):  # to population
+                    data_desired_eq = itertools.combinations(selection_desired_eq, population_desired_eq)
+                    sublists_desired_eq = list(data_desired_eq)
+                    for k in range(len(sublists_desired_eq)):
+                        desired_eq_list = sublists_desired_eq[k]
+                        desired_eq = [] * population
+                        for h in range(population):
+                            if h in co_list:
+                                desired_eq.append('A')
+                            elif (h > 0 and desired_eq[h - 1] == 'B') or (h == population-2 and desired_eq[0]=='B' ):
+                                desired_eq.append('A')
+                            elif h not in desired_eq_list :
+                                desired_eq.append('B')
+                            else:
+                                desired_eq.append('A')
+                        # desired_eq = list(dict.fromkeys(desired_eq))
+                        selection_init = [i for i in range(population)]
+                        for population_init in range(population + 1):  # to population
+                            data_init = itertools.combinations(selection_init, population_init)
+                            sublists_init = list(data_init)
+                            for z in range(len(sublists_init)):
+                                init_list = sublists_init[z]
+                                initial_strategy = []
+                                for v in range(population):
+                                    if v in init_list:
+                                        initial_strategy.append("A")
+                                    else:
+                                        initial_strategy.append("B")
+                                # do the work:
+                                init_string = str(initial_strategy)
+                                print("init: " + init_string + "\ndesired: " + str(desired_eq) + "\ntypes: " + str(
+                                    type_list))
+                                activated_list = zeros(population)
+                                simulation = Simulation(population, Z_func, initial_strategy, type_list, activated_list,
+                                                        desired_eq, init_string)
+                                new_result, equilibrated, eq_time, reached_desired = simulation.one_episode(time_steps,
+                                                                                                            threshold)
+                                #     result = pd.DataFrame.from_records
+                                result = result.append(new_result)
+                                print("desired: " + str(desired_eq))
+                                print("init:    " + init_string)
     result.to_csv(f"newfile.csv")
-
-    print("desired: " + str(desired_eq))
-    print("init:    " + init)
 
 
 if __name__ == '__main__':
