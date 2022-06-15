@@ -117,7 +117,8 @@ class Simulation:
         current_strategy_list = self.strategy_list
         prev_i = -2
         for t in range(time_steps):
-            print("current: " + str(current_strategy_list))
+            if reached_desired == 0:
+                print("current: " + str(current_strategy_list))
 
             #             for f in self.agents:
             #                 print("id: "+ str(f.id)+" type: "+f.type+" strategy: "+f.strategy+" willing to be: "+str(f.next_strategy))
@@ -128,7 +129,7 @@ class Simulation:
                 (self.agents[i]).decide_next_strategy(self.agents, self.Z_func, threshold)
                 #                 print("next strategy in this timestep is decided for everyone!")
                 current_strategy_list[i] = self.agents[i].strategy
-                reached_desired = (self.strategy_list == current_strategy_list)
+                reached_desired = (self.desired_eq == current_strategy_list)
             # RANDOM AGENT TO BE ACTIVATED
             # index_list = rnd.sample(range(self.population), k = 1)#########GGG#####
             # index = index_list[0]
@@ -160,8 +161,8 @@ class Simulation:
 
         new_result = pd.DataFrame(
             {'reached_desired?': [reached_desired], 'Equilibrated?': [equilibrated], 'types': [self.type_list],
-             'initial strategy set': self.initial_string, 'final strategy set': [current_strategy_list],
-             'equilibration time': [eq_time]})
+             'initial': self.initial_string, 'final': [current_strategy_list],
+             'desired': [self.desired_eq]})
         return new_result, equilibrated, eq_time, reached_desired
 
     def activate_policy(self, prev_i):

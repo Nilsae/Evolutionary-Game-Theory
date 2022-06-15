@@ -10,14 +10,14 @@ from pandas import concat
 
 
 def main():
-    population = 9  # number of agents
+    # population = 9  # number of agents
     time_steps = 30
     threshold = 1 / 2
     Z_func = "A"  # the next strategy if number of A-playing neighbors equlas B-playing ones
     global new_result
     result = pd.DataFrame(
-        {'reached_desired?': [], 'Equilibrated?': [], 'types': [], 'initial strategy set': [], 'final strategy set': [],
-         'equilibration time': []})
+        {'reached_desired?': [], 'Equilibrated?': [], 'types': [], 'initial': [], 'final': [],
+         'desired': []})
     # algorithm works on:
     # desired_eq = ['A', 'A', 'B', 'A', 'B', 'A', 'A', 'B', 'A']  # desired equilibrium strategy of the agents
     # type_list = ['+', '+', '-', '-', '-', '+', '-', '-',
@@ -29,7 +29,8 @@ def main():
     #     type_list = ['+', '-', '-', '+', '-', '-', '+', '+']  # coordinator or anticoordinator listed identified by + and - signs
     #     initial_strategy = ['B', 'B', 'B', 'B', 'B', 'B', 'B','B']  # initial strategy of the agents# selection = [i for i in range(population)]
     # brute force:
-    for population in range(5, 6):
+    desired_record = []
+    for population in range(5, 10):
         selection_co = [i for i in range(population)]
         for population_co in range(population + 1):  # to population
             data_co = itertools.combinations(selection_co, population_co)
@@ -55,13 +56,17 @@ def main():
                         for h in range(population):
                             if h in co_list:
                                 desired_eq.append('A')
-                            elif (h > 0 and desired_eq[h - 1] == 'B') or (h == population-2 and desired_eq[0]=='B' ):
+                            elif (h > 0 and desired_eq[h - 1] == 'B') or (h == population-1 and desired_eq[0]=='B' ):
                                 desired_eq.append('A')
                             elif h not in desired_eq_list :
                                 desired_eq.append('B')
                             else:
                                 desired_eq.append('A')
                         # desired_eq = list(dict.fromkeys(desired_eq))
+                        if desired_eq not in desired_record:
+                            desired_record.append(desired_eq)
+                        else:
+                            continue
                         selection_init = [i for i in range(population)]
                         for population_init in range(population + 1):  # to population
                             data_init = itertools.combinations(selection_init, population_init)
@@ -84,10 +89,11 @@ def main():
                                 new_result, equilibrated, eq_time, reached_desired = simulation.one_episode(time_steps,
                                                                                                             threshold)
                                 #     result = pd.DataFrame.from_records
-                                result = result.append(new_result)
-                                print("desired: " + str(desired_eq))
-                                print("init:    " + init_string)
-    result.to_csv(f"newfile.csv")
+                                if reached_desired == 0:
+                                    result = result.append(new_result)
+                                    print("desired: " + str(desired_eq))
+                                    print("init:    " + init_string)
+        result.to_csv(f"newfile{population}.csv")
 
 
 if __name__ == '__main__':
