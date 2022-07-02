@@ -8,13 +8,13 @@ from csv import writer
 import itertools
 
 
-
-def equilibrated(current_strtegy_list, type_list, population, willing_list=[]):
+def equilibrated_func(current_strtegy_list, type_list, population):
+    willing_list = [""] * population
     for agent_id in range(population):
         if type_list[agent_id] == '+':
             willing_list = coordinating(agent_id, current_strtegy_list, willing_list, population)
         else:
-            willing_list = anti_coordinating(agent_id, current_strtegy_list, willing_list)
+            willing_list = anti_coordinating(agent_id, current_strtegy_list, willing_list, population)
 
     equilibrated = 1
     for agent_id in range(population):
@@ -23,6 +23,7 @@ def equilibrated(current_strtegy_list, type_list, population, willing_list=[]):
             break
 
     return equilibrated
+
 
 def coordinating(agent_id, current_strategy_list, willing_list, population):
     A_neighbors_count = 0
@@ -41,11 +42,12 @@ def coordinating(agent_id, current_strategy_list, willing_list, population):
             A_neighbors_count = A_neighbors_count + 1
         else:
             B_neighbors_count = B_neighbors_count + 1
-
+    print(agent_id)
     if A_neighbors_count >= B_neighbors_count:
         willing_list[agent_id] = "A"
     else:
         willing_list[agent_id] = "B"
+
     return willing_list
 
 
@@ -66,7 +68,8 @@ def anti_coordinating(agent_id, current_strategy_list, willing_list, population)
             A_neighbors_count = A_neighbors_count + 1
         else:
             B_neighbors_count = B_neighbors_count + 1
-
+    #     print(agent_id)
+    #     print(willing_list)
     if A_neighbors_count <= B_neighbors_count:
         willing_list[agent_id] = "A"
     else:

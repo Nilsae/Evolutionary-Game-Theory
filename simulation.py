@@ -11,7 +11,7 @@ import itertools
 
 def plus(idd, number, population):
     if idd + number >= population:
-        return idd + number - population - 1
+        return idd + number - population
     else:
         return idd + number
 
@@ -117,8 +117,8 @@ class Simulation:
         current_strategy_list = self.strategy_list
         prev_i = -2
         for t in range(time_steps):
-            if reached_desired == 0:
-                print("current: " + str(current_strategy_list))
+            # if reached_desired == 0:
+            print("current: " + str(current_strategy_list))
 
             #             for f in self.agents:
             #                 print("id: "+ str(f.id)+" type: "+f.type+" strategy: "+f.strategy+" willing to be: "+str(f.next_strategy))
@@ -200,7 +200,11 @@ class Simulation:
                 else:
                     if w == 0:
                         c1.append(agent.id)
-                    elif agent.type == '+':
+                    elif agent.type == '+' or (agent.type == '-' and agent.strategy == 'B' and \
+                                               self.strategy_list[plus(agent.id, 1, self.population)] == 'B' and \
+                                               self.type_list[plus(agent.id, 1, self.population)] == '+'and \
+                                               self.strategy_list[minus(agent.id, 1, self.population)] == 'B' and \
+                                               self.type_list[minus(agent.id, 1, self.population)] == '+'):
                         c2.append(agent.id)
         #         for f in c3:
         #             if w==1:
