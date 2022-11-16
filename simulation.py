@@ -17,8 +17,8 @@ def plus(idd, number, population):
 
 
 def minus(idd, number, population):
-    if idd + number <= 0:
-        return population - idd
+    if idd - number < 0:
+        return population - idd -number
     else:
         return idd - 1
 
@@ -202,13 +202,32 @@ class Simulation:
                         c1.append(agent.id)
                     elif agent.type == '+' or (agent.type == '-' and agent.strategy == 'B' and \
                                                self.strategy_list[plus(agent.id, 1, self.population)] == 'B' and \
-                                               self.type_list[plus(agent.id, 1, self.population)] == '+'and \
+                                               self.type_list[plus(agent.id, 1, self.population)] == '+' and \
                                                self.strategy_list[minus(agent.id, 1, self.population)] == 'B' and \
                                                self.type_list[minus(agent.id, 1, self.population)] == '+'):
                         c2.append(agent.id)
         #         for f in c3:
         #             if w==1:
         #                 c3.drop(f)
+
+        #         sort c3 by the least activated
+        #     for i in range(n):
+        #         for j in range(0, n - i - 1):
+
+        #             # Range of the array is from 0 to n-i-1
+        #             # Swap the elements if the element found
+        #             #is greater than the adjacent element
+        #             if arr[j] > arr[j + 1]:
+        #                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
+        #         if len(c3)>1:
+        #             for i, agi in enumerate(c3):
+        #                 for j in range (0, len(c3)-i-1):
+        #                     if self.activated_list[j]>self.activated_list[j+1]:
+        #                         vartemp = c3[i]
+        #                         c3[i] = c3[i+1]
+        #                         c3[i+1] = vartemp
+        potential3 = []
+        ac3 = []
         print("c1: " + str(c1) + " c2: " + str(c2) + " c3: " + str(c3))
         print("agents activated so far: " + str(self.activated_list))
         for i in range(self.population):
@@ -221,7 +240,11 @@ class Simulation:
                 return i
         for i in range(self.population):
             if i in c3 and i != prev_i and self.activated_list[i] <= 3:
-                self.activated_list[i] = self.activated_list[i] + 1
-                return i
+                potential3.append(i)
+                ac3.append(self.activated_list[i])
+        for ag in potential3:
+            if self.activated_list[ag] == min(ac3):
+                self.activated_list[ag] = self.activated_list[ag] + 1
+                return ag
 
         return -1

@@ -83,6 +83,7 @@ def main():
                                     else:
                                         initial_strategy.append("B")
                                 isABA = 0
+                                isABBA = 0
                                 for dele in range(population):
                                     if dele+1 == population :
                                         initial_n1 = initial_strategy[0]
